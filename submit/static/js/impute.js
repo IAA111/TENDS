@@ -90,14 +90,19 @@ function Task() {
       }
     });
 
+
     socket.onmessage = function(event){
+
         console.log(`return message:${event.data}`);
         let data = JSON.parse(event.data);
 
         if(data.hasOwnProperty("impute_data")) {
         // 更新饼图
         chartControl_missing.updateChart(data.impute_data);
-    }
+        }
+
+        // status
+        document.getElementById("Status").textContent = data.status;
 
         if (data.status === "progressing") {
             document.getElementById('predict').className = 'glyphicon glyphicon-record processing-color';
@@ -112,7 +117,6 @@ function Task() {
         }
 
         let start_time = new Date(data.start_time * 1000);
-        document.getElementById("Status").textContent = data.status;
 
         if (intervalId) {
             clearInterval(intervalId);

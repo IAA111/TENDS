@@ -14,3 +14,22 @@ def offline(request):
 
 def online(request):
     return render(request, 'predict.html')
+
+@csrf_exempt
+def task_save(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+
+        PredictWindowSizestr = data.get('PredictWindowSize')
+        PredictWindowSize = float(PredictWindowSizestr.strip('%')) / 100
+
+        obj = models.Task(
+            impute_model=data.get('ImputeModel'),
+            predict_model=data.get('PredictModel'),
+            predict_window_size=PredictWindowSize,
+        )
+        obj.save()
+        print(data)
+        return JsonResponse({"message": "Parameters were saved successfully."})
+    else:
+        return JsonResponse({"error": "error."})
