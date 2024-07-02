@@ -23,6 +23,8 @@ $(function (){
     bindBtnDetails();
     // 保存 details 设置按钮
     bindBtnSaveDetails();
+    // 动态折线图
+    initChart();
 })
 
 function PredictWindowSize(){
