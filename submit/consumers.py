@@ -1,11 +1,17 @@
 import asyncio
 import json
 import time
+import asyncio
 from asgiref.sync import sync_to_async
-from submit.models import Task
+from submit.models import Task,PreData
 from channels.consumer import AsyncConsumer
+from geomloss import SamplesLoss
+from sklearn.preprocessing import StandardScaler
+import numpy as np
+from submit.utils import *
 import csv
 import pandas as pd
+import torch
 from . import models
 from . import views
 
@@ -44,7 +50,7 @@ class TaskChatConsumer(AsyncConsumer):
         print("disconnected", event)
 
     async def start_task(self):
-        # 获取参数
+        # get task parameters
         task_parameters = await sync_to_async(Task.objects.last, thread_sensitive=True)()
         self.impute_model = task_parameters.impute_model
         self.predict_model = task_parameters.predict_model
@@ -72,13 +78,111 @@ class TaskChatConsumer(AsyncConsumer):
     async def impute(self):
 
         print("开始执行补全")
+        await sync_to_async(PreData.objects.all().delete)()
 
-        '''  
+        def OTimputer(X, eps, X_true):
+            batchsize = 128
+            niter = 3000
+            OT_lr = 1e-2
+            noise = 0.1
+            n_pairs = 1
+            opt = torch.optim.RMSprop
 
-             具体补全过程
+            sk = SamplesLoss("sinkhorn", p=2, blur=eps, scaling=0.9, backend="tensorized")
 
-        '''
-        await asyncio.sleep(10)
+            X = X.clone()
+            n, d = X.shape
+
+            if batchsize > n // 2:
+                e = int(np.log2(n // 2))
+                batchsize = 2 ** e
+
+            mask = torch.isnan(X).double()
+
+            # initialization
+            imps = (noise * torch.randn(mask.shape).double() + nanmean(X, 0))[mask.bool()]
+            imps.requires_grad = True
+
+            optimizer = opt([imps], lr=OT_lr)
+
+            maes = np.zeros(niter)
+            rmses = np.zeros(niter)
+
+            for i in range(niter):
+                # initialize
+                X_filled = X.detach().clone()
+                X_filled[mask.bool()] = imps
+                loss = 0
+                for _ in range(n_pairs):
+                    idx1 = np.random.choice(n, batchsize, replace=False)
+                    idx2 = np.random.choice(n, batchsize, replace=False)
+
+                    X1 = X_filled[idx1]
+                    X2 = X_filled[idx2]
+
+                    loss += sk(X1, X2)  # Sinkhorn Distance
+
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+
+                maes[i] = MAE(X_filled, X_true, mask).item()
+                rmses[i] = RMSE(X_filled, X_true, mask).item()
+
+            X_filled = X.detach().clone()
+            X_filled[mask.bool()] = imps
+
+            return X_filled
+
+        f = "/Users/sherryd/Desktop/asf1_0.1miss.csv"
+
+        start_time = time.time()
+
+        df = pd.read_csv(f, header=0)
+        # df.values 将 DataFrame 转换为 NumPy 数组
+        X = df.values[::].astype('float')  # 得到缺失数组
+
+        # 得到 mask nan 对应 True
+        mask = np.isnan(X)
+
+        # 同一列上下非nan邻居值的均值补全
+        X = fillna_mean_of_neighbors(X)
+
+        # 进行标准化
+        scaler = StandardScaler()
+        scaler.fit(X)
+        ground_truth = scaler.transform(X)
+        X_true = torch.tensor(ground_truth)
+
+        # 补全部分
+        mask = torch.from_numpy(mask)
+        X_nas = X_true.clone()
+        X_nas[mask.bool()] = np.nan  # 将 X_nas 中 mask 为 True 的位置设置为 NaN  缺失数据
+
+        M = mask.sum(1) > 0
+        nimp = M.sum().item()  # 缺失值数量
+
+        quantile = .5
+        quantile_multiplier = 0.05
+        epsilon = pick_epsilon(X_nas, quantile, quantile_multiplier)
+
+        sk_imp = OTimputer(X_nas.clone(), epsilon, X_true)
+        sk_imp = sk_imp.detach()
+
+        sk_imp = scaler.inverse_transform(sk_imp)
+
+        mask = mask.numpy()
+
+        save_predata = sync_to_async(PreData.save)
+
+        for i, row in enumerate(sk_imp):
+            predata = PreData(
+                index=i,
+                data=str(row),
+                mask=str(mask[i]),
+            )
+            # 使用await调用异步保存方法
+            await save_predata(predata)
 
 
     async def predict(self):

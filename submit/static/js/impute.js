@@ -23,8 +23,6 @@ $(function (){
     bindBtnDetails();
     // 保存 details 设置按钮
     bindBtnSaveDetails();
-    // 动态折线图
-    initChart();
 })
 
 function PredictWindowSize(){
@@ -187,45 +185,6 @@ function TaskSetSave() {
   });
 }
 
-function initChart(){
-    option = {
-
-        title: {
-            text: 'Dynamic Data'
-        },
-
-        tooltip: {
-            trigger: 'axis',
-            formatter: function (params) {
-                const date = params[0].name.split("_")[0];
-                return (
-                    date +
-                    ' : ' +
-                    params[0].value[1]
-                );
-            },
-            axisPointer: {
-                animation: false
-            }
-        },
-
-        xAxis: {
-            type: 'category',
-            splitLine: {
-                show: false
-            }
-        },
-        yAxis: {
-            type: 'value',
-            boundaryGap: [0, '100%'],
-            splitLine: {
-                show: false
-            }
-        },
-        series: []
-    };
-    myChart.setOption(option);
-}
 
 
 function initMissingRateChart(){

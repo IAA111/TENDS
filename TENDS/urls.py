@@ -23,4 +23,5 @@ urlpatterns = [
     path("offline/",views.offline),
     path("online/",views.online),
     path('task/save/', views.task_save),
+
 ]
