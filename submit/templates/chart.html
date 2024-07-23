@@ -46,11 +46,11 @@ function initChart(){
             }
         },
         xAxis: {
-            type: 'category',
+            type: 'value',
             splitLine: {
                 show: false
             },
-            data: []
+            boundaryGap: false,
         },
         yAxis: {
             type: 'value',
@@ -110,6 +110,7 @@ function process_data(newData) {
     newData.figures.forEach((value, i) => {
         if (option.series[i * 2].data.length >= maxRealLineSeriesLength) {
             let removedIndex = option.series[i * 2].data.shift().name; // 获取被移除数据点的index
+
         if (option.series[i * 2].markPoint && option.series[i * 2].markPoint.data.length > 0) {
             // 过滤掉与被移除数据点相关的markPoint
             option.series[i * 2].markPoint.data = option.series[i * 2].markPoint.data.filter(
@@ -181,14 +182,13 @@ function process_data(newData) {
         }
     });
 
-    option.xAxis.data.push(newData.index);
+
      myChart1.setOption({
-        xAxis: {
-            type: 'category',
-            boundaryGap: false, // 关闭左右两侧留白
-            data: option.xAxis.data
-        },
         series: option.series,
+          xAxis: {
+            min: 'dataMin',
+            max: 'dataMax'
+        }
     });
 }
 
