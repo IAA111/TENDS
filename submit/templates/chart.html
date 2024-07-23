@@ -49,7 +49,8 @@ function initChart(){
             type: 'category',
             splitLine: {
                 show: false
-            }
+            },
+            data: []
         },
         yAxis: {
             type: 'value',
@@ -107,14 +108,15 @@ function process_data(newData) {
     }
 
     newData.figures.forEach((value, i) => {
-
         if (option.series[i * 2].data.length >= maxRealLineSeriesLength) {
-            option.series[i * 2].data.shift();
-            if (option.series[i * 2].markPoint && option.series[i * 2].markPoint.data.length > 0) {
-                if (option.series[i * 2].markPoint.data[0].coord[0] <= newData.time - maxRealLineSeriesLength) {
-                    option.series[i * 2].markPoint.data.shift();
-                }
-            }
+            let removedIndex = option.series[i * 2].data.shift().name; // 获取被移除数据点的index
+        if (option.series[i * 2].markPoint && option.series[i * 2].markPoint.data.length > 0) {
+            // 过滤掉与被移除数据点相关的markPoint
+            option.series[i * 2].markPoint.data = option.series[i * 2].markPoint.data.filter(
+                markPoint => markPoint.coord[0] !== removedIndex
+            );
+        }
+
         }
 
         var dataPoint = {
@@ -126,12 +128,12 @@ function process_data(newData) {
 
         if(newData.predicted_figures[i] !== null) {
             if(option.series[i * 2 + 1].data.length >= maxDashedLineSeriesLength) {
-                option.series[i * 2 + 1].data.shift();
-                if(option.series[i * 2 + 1].markPoint && option.series[i * 2 + 1].markPoint.data.length > 0){
-                    if (option.series[i * 2 + 1].markPoint.data[0].coord[0] <= newData.time - maxDashedLineSeriesLength) {
-                        option.series[i * 2 + 1].markPoint.data.shift();
-                    }
-                }
+                 let removedIndex = option.series[i * 2 + 1].data.shift().name;
+        if (option.series[i * 2 + 1].markPoint && option.series[i * 2 + 1].markPoint.data.length > 0) {
+            option.series[i * 2 + 1].markPoint.data = option.series[i * 2 + 1].markPoint.data.filter(
+                markPoint => markPoint.coord[0] !== removedIndex
+            );
+        }
             }
 
             var predictedDataPoint = {
@@ -179,12 +181,14 @@ function process_data(newData) {
         }
     });
 
-    myChart1.setOption({
-        series: option.series,
+    option.xAxis.data.push(newData.index);
+     myChart1.setOption({
         xAxis: {
-            min: 'dataMin',
-            max: 'dataMax'
-        }
+            type: 'category',
+            boundaryGap: false, // 关闭左右两侧留白
+            data: option.xAxis.data
+        },
+        series: option.series,
     });
 }
 
