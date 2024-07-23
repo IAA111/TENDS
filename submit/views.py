@@ -35,23 +35,46 @@ def task_save(request):
         return JsonResponse({"error": "error."})
 
 def get_chart_data(request):
-    PREDICTION_START_POINT = 2000  # 开始预测位置的索引
-    data = models.PreData.objects.all().order_by('index').values('index', 'data', 'predicted_data', 'mask',
-                                                                 'predicted_mask', 'time')
-    print(data)
+    PREDICTION_START_POINT = 3000
+    data = models.PreData.objects.all().order_by('index').values()
+    formatted_data = []
+    for row in data:
+        index = row['index']
+        figures = [float(i) for i in row['data'].split(',')]
 
-    '''"   time": data["time"].strftime('%Y-%m-%d %H:%M:%S'),   '''
-    formatted_data = [
-        {
-         "index": data["index"],
-         "figures": [float(i) for i in data["data"].split(",")],
-         "predicted_figures": [float(i) if data["index"] >= PREDICTION_START_POINT else None for i in
-                               data["predicted_data"].split(",")],
-         "highlighted_figures": [float(d) if m == 'True' else None for d, m in
-                                 zip(data["data"].split(","), data["mask"].split(","))],
-         "highlighted_predicted_figures": [float(d) if m == 'True' else None for d, m in
-                                           zip(data["predicted_data"].split(","), data["predicted_mask"].split(","))]
-         } for data in data
-    ]
+        # 去除mask中的空格并转换为布尔值
+        mask_values = [m.strip() == 'True' for m in row['mask'].split(',')]
+
+        highlighted_figures = [float(d) if m else None for d, m in zip(figures, mask_values)]
+        print("Mask:", row['mask'])
+        print("Mask Split:", row['mask'].split(','))
+        print("Processed Mask:", mask_values)
+        print("Zipped Figures and Mask:")
+        for d, m in zip(figures, mask_values):
+            print(f"\tFigure: {d}, Mask Value: {m}")
+        print(highlighted_figures)
+
+        for d, m in zip(figures, mask_values):
+            print(f"\tFigure: {d}, Mask Value: {m}")
+
+        if index < PREDICTION_START_POINT:
+            predicted_figures = [None] * len(figures)
+            highlighted_predicted_figures = [None] * len(figures)
+        else:
+            predicted_data_list = row['predicted_data'].split(',')
+            predicted_figures = [float(i) if i else None for i in predicted_data_list]
+
+            # 同样地，处理predicted_mask
+            predicted_mask_values = [m.strip() == 'True' for m in row['predicted_mask'].split(',')]
+            highlighted_predicted_figures = [float(d) if m else None for d, m in
+                                             zip(predicted_figures, predicted_mask_values)]
+
+        formatted_data.append({
+            "index": index,
+            "figures": figures,
+            "predicted_figures": predicted_figures,
+            "highlighted_figures": highlighted_figures,
+            "highlighted_predicted_figures": highlighted_predicted_figures,
+        })
 
     return JsonResponse(formatted_data, safe=False)

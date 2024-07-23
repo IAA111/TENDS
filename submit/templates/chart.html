@@ -8,7 +8,7 @@
 </head>
 <body>
 
- <div id="main" style="width: 100%;height: 400px;">
+<div id="main" style="width: 100%;height: 100%;">
 
 </div>
 
@@ -72,18 +72,22 @@ function updateChart() {
         type: "GET",
         dataType: "json",
         success: function (res) {
+            console.log('AJAX请求成功:', res);
             if(current_index < res.length) {  // 如果还有数据可获取
                 var new_data = res[current_index];  // 获取一个数据点，而不是整个列表
                 process_data(new_data);
                 current_index++;  // 更新当前索引
             }
+        },
+        error: function (xhr, status, error) {
+            console.error('AJAX请求失败:', status, error);
         }
     });
 }
 
 function process_data(newData) {
+    console.log('Received newData:', newData);
     var figureCount = newData.figures.length;
-
     while (option.series.length < figureCount * 2) {
         var figureNumber = Math.floor(option.series.length / 2);
         var isPredicted = option.series.length % 2 == 1;
@@ -96,17 +100,17 @@ function process_data(newData) {
                 data: []
             },
             showSymbol: false,
-             name: isPredicted ? '' : seriesName,
+            name: isPredicted ? '' : seriesName,
             lineStyle: isPredicted ? { type: 'dashed' ,width:5} : {},
             itemStyle: { color: color }
         });
-
     }
 
     newData.figures.forEach((value, i) => {
+
         if (option.series[i * 2].data.length >= maxRealLineSeriesLength) {
             option.series[i * 2].data.shift();
-            if(option.series[i * 2].markPoint.data.length > 0){
+            if (option.series[i * 2].markPoint && option.series[i * 2].markPoint.data.length > 0) {
                 if (option.series[i * 2].markPoint.data[0].coord[0] <= newData.time - maxRealLineSeriesLength) {
                     option.series[i * 2].markPoint.data.shift();
                 }
@@ -114,8 +118,8 @@ function process_data(newData) {
         }
 
         var dataPoint = {
-            name: newData.time,
-            value: [newData.time, value],
+            name: newData.index,
+            value: [newData.index, value],
         };
 
         option.series[i * 2].data.push(dataPoint);
@@ -123,7 +127,7 @@ function process_data(newData) {
         if(newData.predicted_figures[i] !== null) {
             if(option.series[i * 2 + 1].data.length >= maxDashedLineSeriesLength) {
                 option.series[i * 2 + 1].data.shift();
-                if(option.series[i * 2 + 1].markPoint.data.length > 0){
+                if(option.series[i * 2 + 1].markPoint && option.series[i * 2 + 1].markPoint.data.length > 0){
                     if (option.series[i * 2 + 1].markPoint.data[0].coord[0] <= newData.time - maxDashedLineSeriesLength) {
                         option.series[i * 2 + 1].markPoint.data.shift();
                     }
@@ -131,17 +135,25 @@ function process_data(newData) {
             }
 
             var predictedDataPoint = {
-                name: newData.time,
-                value: [newData.time, newData.predicted_figures[i]],
+                name: newData.index,
+                value: [newData.index, newData.predicted_figures[i]],
             };
 
             option.series[i * 2 + 1].data.push(predictedDataPoint);
         }
 
+        // Ensure markPoint exists before using it
+        if (!option.series[i * 2].markPoint) {
+            option.series[i * 2].markPoint = { data: [] };
+        }
+
+        if (!option.series[i * 2 + 1].markPoint) {
+            option.series[i * 2 + 1].markPoint = { data: [] };
+        }
 
         if (newData.highlighted_figures[i] !== null) {
             var markPoint = {
-                coord: [newData.time, value],
+                coord: [newData.index, value],
                 symbol: 'circle',
                 symbolSize: 20,
                 label: { show: false },
@@ -149,12 +161,13 @@ function process_data(newData) {
                 animationDurationUpdate: 0,
                 itemStyle: { color: 'yellow' },
             };
+            console.log('Real Line MarkPoint:', markPoint);
             option.series[i * 2].markPoint.data.push(markPoint);
         }
 
         if (newData.highlighted_predicted_figures[i] !== null && newData.predicted_figures[i] !== null) {
             var markPoint = {
-                coord: [newData.time, newData.predicted_figures[i]],
+                coord: [newData.index, newData.predicted_figures[i]],
                 symbol: 'circle',
                 symbolSize: 20,
                 label: { show: false },
@@ -174,6 +187,7 @@ function process_data(newData) {
         }
     });
 }
+
 // Use an interval to update the chart every second
 setInterval(updateChart, 200);
 

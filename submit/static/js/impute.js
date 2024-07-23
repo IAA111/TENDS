@@ -1,7 +1,3 @@
-var myChart = echarts.init(document.querySelector('.box'));
-var maxSeriesLength = 20;
-var data = [];
-
 $(function (){
     // 绑定点击 PredictBatchSize 事件
     PredictWindowSize();
@@ -94,11 +90,6 @@ function Task() {
         console.log(`return message:${event.data}`);
         let data = JSON.parse(event.data);
 
-        if(data.hasOwnProperty("impute_data")) {
-        // 更新饼图
-        chartControl_missing.updateChart(data.impute_data);
-        }
-
         // status
         document.getElementById("Status").textContent = data.status;
 
@@ -107,11 +98,6 @@ function Task() {
         } else if (data.status === "finished") {
             document.getElementById('finished').className = 'glyphicon glyphicon-record processing-color';
             clearInterval(intervalId);
-        }
-
-        if(data.hasOwnProperty("impute_data")) {
-             // 更新图表数据
-             chartControl_missing.updateChart(data.impute_data);
         }
 
         let start_time = new Date(data.start_time * 1000);
@@ -189,7 +175,7 @@ function TaskSetSave() {
 
 function initMissingRateChart(){
 var myChart2 = echarts.init(document.getElementById('missing_rate_chart'));
-    option = {
+    option_2 = {
   title: {
     text: 'missing_rate_chart',
     left: 'center',
@@ -218,27 +204,11 @@ var myChart2 = echarts.init(document.getElementById('missing_rate_chart'));
     }
   ]
 };
-    myChart2.setOption(option);
-    // 在这里定义你的updateChart函数
-    function updateChart(data) {
-        // 将数据转换为 ECharts 饼图所接受的格式
-        var pieData = Object.entries(data).map(([key, value]) => ({name: key, value: value}));
-
-        // 使用 setOption 更新饼图数据
-        myChart2.setOption({
-            series: [{
-                data: pieData
-            }]
-        });
-    }
-    return {
-        updateChart: updateChart
-    };
 }
 
 function initAnomalyRateChart(){
     var myChart3 = echarts.init(document.getElementById('anomaly_rate_chart'));
-    option = {
+    option_3 = {
   title: {
     text: 'anomaly_rate_chart',
     left: 'center',
@@ -272,7 +242,7 @@ function initAnomalyRateChart(){
     }
   ]
 };
-    myChart3.setOption(option);
+    myChart3.setOption(option_3);
 }
 
 function ShowTaskResults(){
