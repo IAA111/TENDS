@@ -23,5 +23,6 @@ urlpatterns = [
     path("offline/",views.offline),
     path("online/",views.online),
     path('task/save/', views.task_save),
+    path("get_chart_data/",views.get_chart_data),
 
 ]

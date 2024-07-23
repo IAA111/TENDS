@@ -33,3 +33,25 @@ def task_save(request):
         return JsonResponse({"message": "Parameters were saved successfully."})
     else:
         return JsonResponse({"error": "error."})
+
+def get_chart_data(request):
+    PREDICTION_START_POINT = 2000  # 开始预测位置的索引
+    data = models.PreData.objects.all().order_by('index').values('index', 'data', 'predicted_data', 'mask',
+                                                                 'predicted_mask', 'time')
+    print(data)
+
+    '''"   time": data["time"].strftime('%Y-%m-%d %H:%M:%S'),   '''
+    formatted_data = [
+        {
+         "index": data["index"],
+         "figures": [float(i) for i in data["data"].split(",")],
+         "predicted_figures": [float(i) if data["index"] >= PREDICTION_START_POINT else None for i in
+                               data["predicted_data"].split(",")],
+         "highlighted_figures": [float(d) if m == 'True' else None for d, m in
+                                 zip(data["data"].split(","), data["mask"].split(","))],
+         "highlighted_predicted_figures": [float(d) if m == 'True' else None for d, m in
+                                           zip(data["predicted_data"].split(","), data["predicted_mask"].split(","))]
+         } for data in data
+    ]
+
+    return JsonResponse(formatted_data, safe=False)

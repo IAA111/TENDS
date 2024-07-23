@@ -76,8 +76,10 @@ class TaskChatConsumer(AsyncConsumer):
         })
 
     async def impute(self):
-
         print("开始执行补全")
+
+        '''
+
         await sync_to_async(PreData.objects.all().delete)()
 
         def OTimputer(X, eps, X_true):
@@ -176,13 +178,17 @@ class TaskChatConsumer(AsyncConsumer):
         save_predata = sync_to_async(PreData.save)
 
         for i, row in enumerate(sk_imp):
+            data_str = ', '.join(map(str, row))
+            mask_str = ', '.join(map(str, mask[i]))
             predata = PreData(
                 index=i,
-                data=str(row),
-                mask=str(mask[i]),
+                data=data_str,
+                mask=mask_str,
             )
             # 使用await调用异步保存方法
             await save_predata(predata)
+            '''
+
 
 
     async def predict(self):

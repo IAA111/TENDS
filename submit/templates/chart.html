@@ -12,9 +12,9 @@
 
 </div>
 
-<script src="{% static "js/jquery-3.7.1.min.js" %}"></script>
+<script src="{% static "plugins/jquery-3.7.1.min.js" %}"></script>
 <script src="{% static "plugins/bootstrap-3.4.1/js/bootstrap.min.js" %}"></script>
-<script src="{% static 'js/echarts.min.js' %}"></script>
+<script src="{% static 'plugins/echarts.min.js' %}"></script>
 <script type="text/javascript">
 
 
@@ -23,15 +23,21 @@ $(function (){
     updateChart();
 })
 
-// 初始化图表
+
+var current_index = 0;
 var myChart1 = echarts.init(document.getElementById('main'));
-var maxSeriesLength = 100;  // 最大数据点数
+var maxSeriesLength = 20;
+var maxRealLineSeriesLength = 20
+var maxDashedLineSeriesLength = 5
+
+
 var option = null;
+var colors = ["#488f31", "#59cdaa", "#1b9be0", "#56428e", "#9c56b8", "#c23b75", "#ec2176", "#f03867", "#f66f4b", "#fca443", "#f3d72b", "#9edb40", "#30c16f", "#179f8c", "#147f9f", "#4986b5", "#7278a6", "#a066ab"];
 
 function initChart(){
     option = {
         title: {
-            text: 'Dynamic Data'
+            text: ''
         },
         tooltip: {
             trigger: 'axis',
@@ -40,7 +46,7 @@ function initChart(){
             }
         },
         xAxis: {
-            type: 'value',
+            type: 'category',
             splitLine: {
                 show: false
             }
@@ -53,12 +59,13 @@ function initChart(){
             },
             max: 'dataMax',
         },
-        series: []
+        series: [],
+        legend: {},
+        animationDurationUpdate: 0,
     };
     myChart1.setOption(option);
 }
 
-var current_index = 0;  // 添加一个变量来追踪当前需要获取的数据在列表中的位置
 function updateChart() {
     $.ajax({
         url: "/get_chart_data/",
@@ -75,67 +82,98 @@ function updateChart() {
 }
 
 function process_data(newData) {
-    var seriesCount = newData.figures.length;
+    var figureCount = newData.figures.length;
 
-    while (option.series.length < seriesCount) {
-        var figureNumber = option.series.length + 1;
+    while (option.series.length < figureCount * 2) {
+        var figureNumber = Math.floor(option.series.length / 2);
+        var isPredicted = option.series.length % 2 == 1;
+        var color = colors[figureNumber % colors.length];
+        var seriesName = 'Variable ' + (figureNumber + 1) + (isPredicted ? ' Predicted' : '');
         option.series.push({
             data: [],
-            markPoint: { data: [] },
             type: 'line',
+            markPoint: {
+                data: []
+            },
             showSymbol: false,
-            name: 'Figure ' + figureNumber,
+             name: isPredicted ? '' : seriesName,
+            lineStyle: isPredicted ? { type: 'dashed' ,width:5} : {},
+            itemStyle: { color: color }
         });
+
     }
 
     newData.figures.forEach((value, i) => {
-        if (option.series[i].data.length >= maxSeriesLength) {
-            option.series[i].data.shift();
-            if(option.series[i].markPoint.data.length > 0){
-                if (option.series[i].markPoint.data[0].coord[0] <= newData.index - maxSeriesLength) {
-                    option.series[i].markPoint.data.shift();
+        if (option.series[i * 2].data.length >= maxRealLineSeriesLength) {
+            option.series[i * 2].data.shift();
+            if(option.series[i * 2].markPoint.data.length > 0){
+                if (option.series[i * 2].markPoint.data[0].coord[0] <= newData.time - maxRealLineSeriesLength) {
+                    option.series[i * 2].markPoint.data.shift();
                 }
             }
         }
 
         var dataPoint = {
-            name: newData.index.toString(),
-            value: [newData.index, value],
+            name: newData.time,
+            value: [newData.time, value],
         };
 
-        option.series[i].data.push(dataPoint);
+        option.series[i * 2].data.push(dataPoint);
+
+        if(newData.predicted_figures[i] !== null) {
+            if(option.series[i * 2 + 1].data.length >= maxDashedLineSeriesLength) {
+                option.series[i * 2 + 1].data.shift();
+                if(option.series[i * 2 + 1].markPoint.data.length > 0){
+                    if (option.series[i * 2 + 1].markPoint.data[0].coord[0] <= newData.time - maxDashedLineSeriesLength) {
+                        option.series[i * 2 + 1].markPoint.data.shift();
+                    }
+                }
+            }
+
+            var predictedDataPoint = {
+                name: newData.time,
+                value: [newData.time, newData.predicted_figures[i]],
+            };
+
+            option.series[i * 2 + 1].data.push(predictedDataPoint);
+        }
+
 
         if (newData.highlighted_figures[i] !== null) {
             var markPoint = {
-                coord: [newData.index, value],
-                symbol: 'diamond',
-                symbolSize: 10,
+                coord: [newData.time, value],
+                symbol: 'circle',
+                symbolSize: 20,
                 label: { show: false },
+                animation: false,
+                animationDurationUpdate: 0,
+                itemStyle: { color: 'yellow' },
             };
-            option.series[i].markPoint.data.push(markPoint);
+            option.series[i * 2].markPoint.data.push(markPoint);
+        }
+
+        if (newData.highlighted_predicted_figures[i] !== null && newData.predicted_figures[i] !== null) {
+            var markPoint = {
+                coord: [newData.time, newData.predicted_figures[i]],
+                symbol: 'circle',
+                symbolSize: 20,
+                label: { show: false },
+                animation: false ,
+                animationDurationUpdate: 0,
+                itemStyle: { color: 'red' },
+            };
+            option.series[i * 2 + 1].markPoint.data.push(markPoint);
         }
     });
 
-    // Update the series with new data and markPoints
-    var updateData = option.series.map((series, i) => {
-        return {
-            data: series.data,
-            type: 'line',
-            showSymbol: false,
-            name: series.name,
-            markPoint: { data: series.markPoint.data,animation: false },
-        };
-    });
-
     myChart1.setOption({
-        series: updateData,
+        series: option.series,
         xAxis: {
             min: 'dataMin',
             max: 'dataMax'
         }
     });
 }
-
 // Use an interval to update the chart every second
 setInterval(updateChart, 200);
 
