@@ -1,4 +1,5 @@
-
+var currentImputePage = 1;
+var currentAnomalyPage = 1;
 $(function (){
     ImputeModelSelect();
     PredictModelSelect();
@@ -257,67 +258,69 @@ function initAnomalyRateChart(){
     myChart3.setOption(option_3);
 }
 
+function fetchImputeData(page = currentImputePage) {
+    currentImputePage = page;  // 更新当前页码
+    $.ajax({
+        url: '/load_impute_results/',
+        method: 'GET',
+        data: {'page': page},
+        success: function(data) {
+            $('#impute-results-table').html(data.html);  // 更新表格内容
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+            console.log('Error fetching impute data:', thrownError);
+        }
+    });
+}
+
+function fetchAnomalyData(page = currentAnomalyPage) {
+    currentAnomalyPage = page;  // 更新当前页码
+    $.ajax({
+        url: '/load_anomaly_results/',
+        method: 'GET',
+        data: {'page': page},
+        success: function(data) {
+            $('#Anomaly-results-table').html(data.html);  // 更新表格内容
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+            console.log('Error fetching anomaly data:', thrownError);
+        }
+    });
+}
+
 function ShowTaskResults(){
+     // 初始加载数据
+    fetchImputeData();
+    fetchAnomalyData();
+
+    // 每秒钟更新一次表格
+    setInterval(fetchImputeData, 1000);
+    setInterval(fetchAnomalyData, 1000);
+
+    // 处理分页点击事件
     $(document).on('click', '.pagination1 a', function (e) {
         e.preventDefault();
         var page = $(this).data('page');
-        $.ajax({
-            url: '/load_impute_results/',  // Set this URL to load impute results data
-            data: {'page': page},
-            method: 'GET',
-            success: function (data) {
-                $('#impute-results-table').html(data.html);  // Update the impute results table
-            },
-            error: function (xhr, ajaxOptions, thrownError) {
-                console.log(thrownError);
-            }
-        });
+        fetchImputeData(page);
     });
 
-    $(document).on('click', '.pagination2 a', function (e) {  // Add a new handler for the second table
+     $(document).on('click', '.pagination2 a', function(e) {
         e.preventDefault();
-
         var page = $(this).data('page');
-
-        $.ajax({
-            url: '/load_anomaly_results/',  // Set this URL to load anomaly results data
-            data: {'page': page},
-            method: 'GET',
-            success: function (data) {
-                $('#Anomaly-results-table').html(data.html);  // Update the anomaly results table
-            },
-            error: function (xhr, ajaxOptions, thrownError) {
-                console.log(thrownError);
-            }
-        });
+        fetchAnomalyData(page);
     });
 
+    // 处理表单提交事件
     $('#impute-results-table').on('submit', 'form', function(e) {
         e.preventDefault();
         var page = $("input[name='page']", this).val();
-
-        $.ajax({
-            url: '/load_impute_results/',  // Set this URL to load impute results data
-            type: 'GET',
-            data: {'page': page},
-            success: function (data) {
-                $('#impute-results-table').html(data.html);
-            }
-        });
+         fetchImputeData(page);
     });
 
     $('#Anomaly-results-table').on('submit', 'form', function(e) {
         e.preventDefault();
         var page = $("input[name='page']", this).val();
-
-        $.ajax({
-            url: '/load_anomaly_results/',  // Set this URL to load anomaly results data
-            type: 'GET',
-            data: {'page': page},
-            success: function (data) {
-                $('#Anomaly-results-table').html(data.html);
-            }
-        });
+        fetchAnomalyData(page);
     });
 }
 
