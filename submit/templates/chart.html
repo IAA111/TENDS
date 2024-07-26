@@ -104,31 +104,32 @@ function process_data(newData) {
     }
 
     newData.figures.forEach((value, i) => {
+        // 移除最左边的补全点
         if (option.series[i * 2].data.length >= maxRealLineSeriesLength) {
             let removedIndex = option.series[i * 2].data.shift().name; // 获取被移除数据点的index
-
-        if (option.series[i * 2].markPoint && option.series[i * 2].markPoint.data.length > 0) {
-            // 过滤掉与被移除数据点相关的markPoint
-            option.series[i * 2].markPoint.data = option.series[i * 2].markPoint.data.filter(
-                markPoint => markPoint.coord[0] !== removedIndex
-            );
+            // 过滤掉与被移除补全数据点相关的markPoint
+            if (option.series[i * 2].markPoint && option.series[i * 2].markPoint.data.length > 0) {
+                option.series[i * 2].markPoint.data = option.series[i * 2].markPoint.data.filter(
+                    markPoint => markPoint.coord[0] !== removedIndex
+                );
+            }
         }
 
-        }
+        // 加入新的补全数据点
         var dataPoint = {
             name: newData.index,
             value: [newData.index, value],
         };
-
         option.series[i * 2].data.push(dataPoint);
 
+        // 若开始预测
         if(newData.predicted_figures[i] !== null) {
             if(option.series[i * 2 + 1].data.length >= maxDashedLineSeriesLength) {
                  let removedIndex = option.series[i * 2 + 1].data.shift().name;
-        if (option.series[i * 2 + 1].markPoint && option.series[i * 2 + 1].markPoint.data.length > 0) {
-            option.series[i * 2 + 1].markPoint.data = option.series[i * 2 + 1].markPoint.data.filter(
-                markPoint => markPoint.coord[0] !== removedIndex
-            );
+                    if (option.series[i * 2 + 1].markPoint && option.series[i * 2 + 1].markPoint.data.length > 0) {
+                        option.series[i * 2 + 1].markPoint.data = option.series[i * 2 + 1].markPoint.data.filter(
+                            markPoint => markPoint.coord[0] !== removedIndex
+                        );
         }
             }
 
@@ -189,7 +190,6 @@ function process_data(newData) {
 
 // Use an interval to update the chart every second
 setInterval(updateChart, 200);
-
 
 </script>
 </body>
