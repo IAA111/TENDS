@@ -350,7 +350,7 @@ function bindBtnSaveDetails(){
             if(data.status == 'OK'){
                 alert('Saved successfully');
                 $("#myModal").modal('hide'); // 关闭模态框
-                // 你可以在这里添加代码来更新页面的其他元素，例如列表或者数据表格，来显示新的数据
+                // 添加代码来更新页面的其他元素，例如列表或者数据表格，来显示新的数据
             } else {
                 alert('Failed to save: ' + data.error);
             }
