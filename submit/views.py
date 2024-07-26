@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
 import json
+from submit.utils.pagination import Pagination
 from django.core import serializers
 from submit import models
 
@@ -14,7 +15,21 @@ def offline(request):
 
 def online(request):
     models.PreData.objects.all().delete()
-    return render(request, 'predict.html')
+
+    queryset1 = models.ImputeResult.objects.all()
+    page_object1 = Pagination(request, queryset1)
+
+    queryset2 = models.AnomalyResult.objects.all()
+    page_object2 = Pagination(request, queryset2)
+
+    context = {
+        'queryset1': page_object1.page_queryset,
+        'page_string1': page_object1.html(),
+        'queryset2': page_object2.page_queryset,
+        'page_string2': page_object2.html()
+    }
+
+    return render(request, 'predict.html',context)
 
 @csrf_exempt
 def task_save(request):
@@ -80,5 +95,32 @@ def get_chart_data(request):
 
     return JsonResponse(formatted_data, safe=False)
 
-def show_chart(request):
-    return render(request, 'chart.html')
+def load_impute_results(request):
+    page = request.GET.get('page', 1)
+    queryset1 = models.ImputeResult.objects.all()
+    page_object1 = Pagination(request, queryset1)
+
+    context = {
+        'queryset1': page_object1.page_queryset,
+        'page_string1': page_object1.html()
+    }
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        html = render_to_string('impute_results.html', context, request=request)
+        return JsonResponse({'html': html})
+    else:
+        return render(request, 'predict.html', context)
+
+def load_anomaly_results(request):
+    page = request.GET.get('page', 1)
+    queryset2 = models.AnomalyResult.objects.all()
+    page_object2 = Pagination(request, queryset2)
+
+    context = {
+        'queryset2': page_object2.page_queryset,
+        'page_string2': page_object2.html()
+    }
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        html = render_to_string('Anomaly_results.html', context, request=request)
+        return JsonResponse({'html': html})
+    else:
+        return render(request, 'predict.html', context)

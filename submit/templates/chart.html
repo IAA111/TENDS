@@ -73,7 +73,6 @@ function updateChart() {
         type: "GET",
         dataType: "json",
         success: function (res) {
-            console.log('AJAX请求成功:', res);
             if(current_index < res.length) {  // 如果还有数据可获取
                 var new_data = res[current_index];  // 获取一个数据点，而不是整个列表
                 process_data(new_data);

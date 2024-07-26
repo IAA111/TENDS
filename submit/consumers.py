@@ -8,7 +8,7 @@ from channels.consumer import AsyncConsumer
 from geomloss import SamplesLoss
 from sklearn.preprocessing import StandardScaler
 import numpy as np
-from submit.utils import *
+from submit.imp_utils import *
 import csv
 import pandas as pd
 import torch
@@ -77,8 +77,8 @@ class TaskChatConsumer(AsyncConsumer):
 
     async def impute(self):
         print("开始执行补全")
-
-
+        '''
+            
         await sync_to_async(PreData.objects.all().delete)()
 
         def OTimputer(X, eps, X_true):
@@ -189,6 +189,7 @@ class TaskChatConsumer(AsyncConsumer):
             )
             # 使用await调用异步保存方法
             await save_predata(predata)
+            '''
 
 
 

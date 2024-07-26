@@ -1,10 +1,8 @@
+
 $(function (){
-    // 绑定点击 PredictBatchSize 事件
-    PredictWindowSize();
-    // 获取补全模型列表
     ImputeModelSelect();
-    //获取预测模型列表
     PredictModelSelect();
+    PredictWindowSize();
     // Task
     Task();
     // 保存任务配置
@@ -21,45 +19,59 @@ $(function (){
     bindBtnSaveDetails();
 })
 
-function PredictWindowSize(){
-    $('#PredictWindowSize a').click(function(){
-        $('#BtnPredictWindowSize').html($(this).text() + ' <span class="caret"></span>');
-    });
-}
+    function ImputeModelSelect() {
+        console.log("Initializing ImputeModelSelect");
 
-function ImputeModelSelect() {
-    var data = {
-        models: ["Model 1", "Model 2", "Model 3", "Model 4"]
-    };
+        var data = {
+            models: ["Model 1", "Model 2", "Model 3", "Model 4"]
+        };
 
-    var selectList = $('#ImputeModelSelect');
+        var selectList = $('#ImputeModelSelect');
+        selectList.empty(); // 确保列表为空
 
-    $.each(data.models, function(i, model) {
-        var listItem = $('<li><label><input type="radio" name="models" value="' + model + '">' + model + '</label></li>');
-        listItem.on('click', function() {
-            var selectedModel = $(this).text();
+        $.each(data.models, function(i, model) {
+            console.log("Adding model to ImputeModelSelect:", model);
+            var listItem = $('<li><label><input type="radio" name="imputeModels" value="' + model + '">' + model + '</label></li>');
+            selectList.append(listItem);
+        });
+
+        // 使用事件委托绑定 click 事件
+        selectList.on('click', 'li', function() {
+            var selectedModel = $(this).find('input').val();
+            console.log("Impute model selected:", selectedModel);
             $('#ImputeModel').text(selectedModel);
         });
-        selectList.append(listItem);
-    });
-}
+    }
 
-function PredictModelSelect() {
-    var data = {
-        models: ["Model 1", "Model 2", "Model 3", "Model 4"]
-    };
+    function PredictModelSelect() {
+        console.log("Initializing PredictModelSelect");
 
-    var selectList = $('#PredictModelSelect');
+        var data = {
+            models: ["Model 1", "Model 2", "Model 3", "Model 4"]
+        };
 
-    $.each(data.models, function(i, model) {
-        var listItem = $('<li><label><input type="radio" name="models" value="' + model + '">' + model + '</label></li>');
-        listItem.on('click', function() {
-            var selectedModel = $(this).text();
+        var selectList = $('#PredictModelSelect');
+        selectList.empty(); // 确保列表为空
+
+        $.each(data.models, function(i, model) {
+            console.log("Adding model to PredictModelSelect:", model);
+            var listItem = $('<li><label><input type="radio" name="predictModels" value="' + model + '">' + model + '</label></li>');
+            selectList.append(listItem);
+        });
+
+        // 使用事件委托绑定 click 事件
+        selectList.on('click', 'li', function() {
+            var selectedModel = $(this).find('input').val();
+            console.log("Predict model selected:", selectedModel);
             $('#PredictModel').text(selectedModel);
         });
-        selectList.append(listItem);
-    });
-}
+    }
+
+    function PredictWindowSize() {
+        $('#PredictWindowSize').on('click', 'a', function() {
+            $('#BtnPredictWindowSize').html($(this).text() + ' <span class="caret"></span>');
+        });
+    }
 
 function Task() {
     let intervalId;
@@ -203,6 +215,7 @@ var myChart2 = echarts.init(document.getElementById('missing_rate_chart'));
     }
   ]
 };
+    myChart2.setOption(option_2);
 }
 
 function initAnomalyRateChart(){
@@ -360,3 +373,6 @@ function bindBtnSaveDetails(){
     });
 })
 }
+
+
+

@@ -15,3 +15,20 @@ class PreData(models.Model):
     predicted_data = models.TextField(default='')
     predicted_mask = models.TextField(default='')
     time = models.DateTimeField(null=True, blank=True)
+
+class ImputeResult(models.Model):
+    time = models.CharField(max_length=24,null=True, blank=True)
+    index = models.IntegerField()
+    variable = models.IntegerField()
+    Imputed_value = models.FloatField()
+
+class AnomalyResult(models.Model):
+    time = models.CharField(max_length=24,null=True, blank=True)
+    index = models.IntegerField()
+    variable = models.IntegerField()
+    true_value = models.FloatField()
+    predict_value = models.FloatField()
+    analysis = models.CharField(max_length=255, default='')
+
+
+
