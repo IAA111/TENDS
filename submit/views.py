@@ -13,6 +13,7 @@ def offline(request):
     return render(request, 'home.html')
 
 def online(request):
+    models.PreData.objects.all().delete()
     return render(request, 'predict.html')
 
 @csrf_exempt
@@ -78,3 +79,6 @@ def get_chart_data(request):
         })
 
     return JsonResponse(formatted_data, safe=False)
+
+def show_chart(request):
+    return render(request, 'chart.html')

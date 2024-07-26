@@ -77,7 +77,7 @@ class TaskChatConsumer(AsyncConsumer):
 
     async def impute(self):
         print("开始执行补全")
-        '''
+
 
         await sync_to_async(PreData.objects.all().delete)()
 
@@ -189,9 +189,6 @@ class TaskChatConsumer(AsyncConsumer):
             )
             # 使用await调用异步保存方法
             await save_predata(predata)
-            
-        '''
-
 
 
 

@@ -64,17 +64,17 @@ function PredictModelSelect() {
 function Task() {
     let intervalId;
     let socket = new WebSocket("ws://localhost:8000/ws/task/")
-    var chartControl_missing = initMissingRateChart();
 
     socket.onopen = function (e){
         console.log("Connection open");
     };
 
     document.getElementById('taskToggle').addEventListener('change', (event) => {
+      const chartContainerElement = document.getElementById('chart-container');
       if (event.target.checked) {
         document.getElementById('click-trigger').className = 'glyphicon glyphicon-record processing-color';
         socket.send(JSON.stringify({"type": "task.start"}));
-      } else {
+    } else {
         socket.send(JSON.stringify({"type": "task.stop"}));
         document.getElementById('click-trigger').className = 'glyphicon glyphicon-record default-color';
         document.getElementById('predict').className = 'glyphicon glyphicon-record default-color';
@@ -118,7 +118,6 @@ function Task() {
         let formattedImputeTime = formatTime(Time);
         document.getElementById("TaskTime").textContent = formattedImputeTime;
     }
-
 }
 
 // 将获得的秒数转换为 HH:MM:SS 格式
