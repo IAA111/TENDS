@@ -15,6 +15,8 @@ import pandas as pd
 import torch
 from . import models
 from . import views
+from statsmodels.tsa.arima.model import ARIMA
+from pmdarima import auto_arima
 
 class TaskChatConsumer(AsyncConsumer):
     def __init__(self, *args, **kwargs):
@@ -203,13 +205,13 @@ class TaskChatConsumer(AsyncConsumer):
             history_data = data[column]
 
             # 创建ETS模型
-            predictor = ETSModel(history_data, error="add", trend="additive", seasonal="add", seasonal_periods=4)
+            model_search = auto_arima(history_data.squeeze(), information_criterion='aic', seasonal_test='ocsb')
 
             # 训练模型
-            fitted_model = predictor.fit()
+            predictor = ARIMA(history_data.squeeze(), order=model_search.order).fit()
 
             # 预测
-            pred_res = fitted_model.forecast(prediction_len)
+            pred_res = predictor.forecast(prediction_len)
 
             # 将预测结果添加到predictions DataFrame结构中
             predictions[column] = pred_res
