@@ -83,7 +83,6 @@ function updateChart() {
 }
 
 function process_data(newData) {
-    console.log('Received newData:', newData);
     var figureCount = newData.figures.length;
     while (option.series.length < figureCount * 2) {
         var figureNumber = Math.floor(option.series.length / 2);

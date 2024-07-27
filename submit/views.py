@@ -62,16 +62,6 @@ def get_chart_data(request):
         mask_values = [m.strip() == 'True' for m in row['mask'].split(',')]
 
         highlighted_figures = [float(d) if m else None for d, m in zip(figures, mask_values)]
-        print("Mask:", row['mask'])
-        print("Mask Split:", row['mask'].split(','))
-        print("Processed Mask:", mask_values)
-        print("Zipped Figures and Mask:")
-        for d, m in zip(figures, mask_values):
-            print(f"\tFigure: {d}, Mask Value: {m}")
-        print(highlighted_figures)
-
-        for d, m in zip(figures, mask_values):
-            print(f"\tFigure: {d}, Mask Value: {m}")
 
         if index < PREDICTION_START_POINT:
             predicted_figures = [None] * len(figures)

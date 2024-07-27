@@ -1,5 +1,8 @@
 var currentImputePage = 1;
 var currentAnomalyPage = 1;
+var myChart2 = echarts.init(document.getElementById('missing_rate_chart'));
+var myChart3 = echarts.init(document.getElementById('anomaly_rate_chart'));
+
 $(function (){
     ImputeModelSelect();
     PredictModelSelect();
@@ -122,6 +125,11 @@ function Task() {
             updateTaskTime(start_time);
         }, 1000);
 
+         if (data.count_nan !== 0 && data.count_not_nan !== 0) {
+            updateMissingRateChart(data.count_nan, data.count_not_nan);
+        }
+
+
     }
 
     function updateTaskTime(StartTime) {
@@ -186,10 +194,9 @@ function TaskSetSave() {
 
 
 function initMissingRateChart(){
-var myChart2 = echarts.init(document.getElementById('missing_rate_chart'));
     option_2 = {
   title: {
-    text: 'missing_rate_chart',
+    text: 'Missing Rate Chart',
     left: 'center',
     top: '18%'
   },
@@ -205,7 +212,9 @@ var myChart2 = echarts.init(document.getElementById('missing_rate_chart'));
       type: 'pie',
       radius: '50%',
       data: [
-      ],
+          { value: 0, name: 'NaN Values' },
+          { value: 0, name: 'Not-NaN Values' }
+        ],
       emphasis: {
         itemStyle: {
           shadowBlur: 10,
@@ -219,8 +228,19 @@ var myChart2 = echarts.init(document.getElementById('missing_rate_chart'));
     myChart2.setOption(option_2);
 }
 
+function updateMissingRateChart(newCount_nan, newCount_not_nan) {
+    myChart2.setOption({
+      series: [{
+        data: [
+          { value: newCount_nan, name: 'NaN Values' },
+          { value: newCount_not_nan, name: 'Not-NaN Values' }
+        ],
+        type: 'pie'
+      }]
+    });
+  }
+
 function initAnomalyRateChart(){
-    var myChart3 = echarts.init(document.getElementById('anomaly_rate_chart'));
     option_3 = {
   title: {
     text: 'anomaly_rate_chart',

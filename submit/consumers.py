@@ -24,6 +24,9 @@ class TaskChatConsumer(AsyncConsumer):
         self.impute_model = None
         self.predict_model = None
         self.predict_window_size = None
+        self.count_nan = 0
+        self.count_not_nan = 0
+
 
     async def websocket_connect(self, event):
         print("connected", event)
@@ -46,6 +49,7 @@ class TaskChatConsumer(AsyncConsumer):
                 self.task.cancel()
                 self.task = None
 
+
     async def websocket_disconnect(self, event):
         print("disconnected", event)
 
@@ -67,18 +71,21 @@ class TaskChatConsumer(AsyncConsumer):
         await self.send_status()
 
     async def send_status(self):
-        await self.send({
-            "type": "websocket.send",
-            "text": json.dumps({
-                "status": self.status,
-                "start_time": self.start_time,
+        try:
+            await self.send({
+                "type": "websocket.send",
+                "text": json.dumps({
+                    "status": self.status,
+                    "start_time": self.start_time,
+                    "count_nan": int(self.count_nan),
+                    "count_not_nan": int(self.count_not_nan),
+                })
             })
-        })
+        except Exception as e:
+            print(f"Error sending status: {e}")
 
     async def impute(self):
         print("开始执行补全")
-
-            
         await sync_to_async(PreData.objects.all().delete)()
 
         def OTimputer(X, eps, X_true):
@@ -146,6 +153,10 @@ class TaskChatConsumer(AsyncConsumer):
         # 得到 mask nan 对应 True
         mask = np.isnan(X)
 
+        # 统计 missing rate
+        self.count_nan = np.sum(mask)
+        self.count_not_nan = np.sum(~mask)
+
         # 同一列上下非nan邻居值的均值补全
         X = fillna_mean_of_neighbors(X)
 
@@ -189,7 +200,7 @@ class TaskChatConsumer(AsyncConsumer):
             )
             # 使用await调用异步保存方法
             await save_predata(predata)
-
+            
 
 
 
