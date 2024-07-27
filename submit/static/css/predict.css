@@ -17,6 +17,10 @@
             font-weight: bold;
          }
 
+     .btn-selected {
+    background-color: #D3D3D3;
+}
+
      .panel {
              margin: 3px 3px;
              padding: 20px;

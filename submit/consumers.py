@@ -7,6 +7,7 @@ from submit.models import Task,PreData,ImputeResult
 from channels.consumer import AsyncConsumer
 from geomloss import SamplesLoss
 from sklearn.preprocessing import StandardScaler
+from statsmodels.tsa.exponential_smoothing.ets import ETSModel
 import numpy as np
 from submit.imp_utils import *
 import csv
@@ -90,7 +91,7 @@ class TaskChatConsumer(AsyncConsumer):
 
         def OTimputer(X, eps, X_true):
             batchsize = 128
-            niter = 3000
+            niter = 300
             OT_lr = 1e-2
             noise = 0.1
             n_pairs = 1
@@ -185,24 +186,84 @@ class TaskChatConsumer(AsyncConsumer):
 
         mask = mask.numpy()
 
-        # 存储补全后数据至PreData
+        # predict
+        # 定义预测长度
+        train_len = int(len(sk_imp) * 0.7)
+        prediction_len = len(sk_imp) - train_len
+
+        df_sk_imp = pd.DataFrame(sk_imp)
+        data = df_sk_imp[:train_len]
+        # 创建一个空的DataFrame来存储预测结果
+        # 使用预测结果的索引
+        predictions = pd.DataFrame(index=pd.RangeIndex(start=len(data), stop=len(data) + prediction_len))
+
+        # 循环遍历DataFrame的每一列
+        for column in data.columns:
+            # 获取当前列的数据
+            history_data = data[column]
+
+            # 创建ETS模型
+            predictor = ETSModel(history_data, error="add", trend="additive", seasonal="add", seasonal_periods=4)
+
+            # 训练模型
+            fitted_model = predictor.fit()
+
+            # 预测
+            pred_res = fitted_model.forecast(prediction_len)
+
+            # 将预测结果添加到predictions DataFrame结构中
+            predictions[column] = pred_res
+
+        predict = predictions.values
+        print(predict)
+        print(train_len, prediction_len, len(sk_imp))  # 1052 451 1503
+
+        predicted_mask = []
+        for i in range(0, prediction_len):
+            row_mask = []
+            for j in range(len(sk_imp[i])):
+                if sk_imp[i + train_len][j] != 0:
+                    diff_percentage = abs((sk_imp[i + train_len][j] - predict[i][j]) / sk_imp[i + train_len][j])
+                    if diff_percentage > 1.2:
+                        row_mask.append(True)
+                    else:
+                        row_mask.append(False)
+                else:
+                    row_mask.append(False)
+            predicted_mask.append(row_mask)
+        predicted_mask = np.array(predicted_mask)
+
+
+        # 存储补全后数据至PreData  前70%
         save_predata = sync_to_async(PreData.save)
 
-        for i, row in enumerate(sk_imp):
-            data_str = ', '.join(map(str, row))
-            mask_str = ', '.join(map(str, mask[i]))
+        for i in range(train_len):
+            data_str = ','.join(map(lambda x: '{:.2f}'.format(x), sk_imp[i]))
+            mask_str = ','.join(map(str, mask[i]))
             predata = PreData(
                 index=i,
                 data=data_str,
                 mask=mask_str,
                 predicted_data='0',
                 predicted_mask='0',
-
             )
-            # 使用await调用异步保存方法
             await save_predata(predata)
 
-        # 存储缺失点信息
+        for i in range(prediction_len):
+            data_str = ','.join(map(lambda x: '{:.2f}'.format(x), sk_imp[i + train_len]))
+            mask_str = ','.join(map(str, mask[i + train_len]))
+            predicted_data_str = ','.join(map(lambda x: '{:.2f}'.format(x), predict[i]))
+            predicted_mask_str = ','.join(map(lambda x: str(x), predicted_mask[i]))
+            predata = PreData(
+                index=i + train_len,
+                data=data_str,
+                mask=mask_str,
+                predicted_data=predicted_data_str,
+                predicted_mask=predicted_mask_str,
+            )
+            await save_predata(predata)
+
+        # 存储缺失点信息 impute_result
         save_impute_result = sync_to_async(ImputeResult.save)
 
         for i, row in enumerate(sk_imp):
@@ -216,9 +277,6 @@ class TaskChatConsumer(AsyncConsumer):
                     )
                     # 使用 await 调用异步保存方法
                     await save_impute_result(impute_result)
-            
-
-
 
     async def predict(self):
         print("开始执行预测")

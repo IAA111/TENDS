@@ -52,7 +52,8 @@ def task_save(request):
         return JsonResponse({"error": "error."})
 
 def get_chart_data(request):
-    PREDICTION_START_POINT = 3000
+    # 开始预测点
+    PREDICTION_START_POINT = 1052
     data = models.PreData.objects.all().order_by('index').values()
     formatted_data = []
     for row in data:

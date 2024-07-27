@@ -18,7 +18,7 @@
 <body>
 
 <div class="container-set">
-    <div class="header">TSMS</div>
+    <div class="header">TENDS</div>
 </div>
 
 <div class="container-fluid">
@@ -132,7 +132,7 @@
                 </div>
                 <div class="container" style="width: 100%;margin-top: 12px">
                     <div class="col-md-8">
-                        <div class="text-grey-small adjust-align">Click Start / Stop Task</div>
+                        <div class="text-grey-small adjust-align"> Start / Stop Task</div>
                     </div>
 
                     <!--滑动框点击开始任务-->
@@ -153,18 +153,18 @@
 
                 <div class="text-grey" style="margin-top: 15px">Prediction Task</div>
                 <div class="container" style="width: 100%;margin-top: 7px">
-                    <div class="col-md-8">
+                    <div class="col-md-7">
                         <div  class="text-grey-small adjust-align">Task status</div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-5">
                         <div id="Status" class="text-blue-small adjust-align">Not started</div>
                     </div>
                 </div>
                 <div class="container" style="width: 100%;margin-top: 5px">
-                    <div class="col-md-8">
+                    <div class="col-md-7">
                         <div class="text-grey-small adjust-align">Executed time</div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-5">
                         <div id="TaskTime" class="text-blue-small adjust-align">00:00:00</div>
                     </div>
                 </div>
@@ -178,19 +178,19 @@
 
                 <div class="container" style="width: 100%; margin-top: 25px;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;margin-left: 5px">
+                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;margin-left: -25px">
                             <span id="click-trigger" style="font-size:30px;" class="glyphicon glyphicon-record"></span>
-                            <p class="text-grey-small adjust-align" style="margin-top: 10px;margin-left: 2px">Click Trigger</p>
+                            <p class="text-grey-small adjust-align" style="margin-top: 10px;margin-left: -5px">Click Trigger</p>
                         </div>
                         <hr style="width: 20%; border: 1px solid black;margin-top: -30px;margin-left: -27px;">
                         <div style="display: flex;flex-direction: column; align-items: center; justify-content: center;">
-                            <span id="predict" style="font-size:30px; margin-left:-138px;" class="glyphicon glyphicon-record"></span>
-                            <p class="text-grey-small adjust-align" style=" margin-left:-130px;margin-top: 10px">Predict</p>
+                            <span id="predict" style="font-size:30px; margin-left:-110px;" class="glyphicon glyphicon-record"></span>
+                            <p class="text-grey-small adjust-align" style=" margin-left:-106px;margin-top: 10px">Predict</p>
                         </div>
                         <hr style="width: 20%; border: 1px solid black;margin-top: -30px;margin-left: -38px">
-                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            <span id="finished" style="font-size:30px;margin-left: -145px;" class="glyphicon glyphicon-record"></span>
-                            <p class="text-grey-small adjust-align" style=" margin-left:-130px;margin-top: 10px">Finished</p>
+                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;margin-left:3px ">
+                            <span id="finished" style="font-size:30px;margin-left: -100px;" class="glyphicon glyphicon-record"></span>
+                            <p class="text-grey-small adjust-align" style=" margin-left:-115px;margin-top: 10px">Finished</p>
                         </div>
                     </div>
                 </div>
@@ -204,21 +204,27 @@
             <div class="panel " style="height: 355px;">
                 <div class="text-black">Ongoing Task</div>
                 <!-- 动态折线图 -->
+                <div class="btn-group btn-group-xs" role="group" aria-label="Extra-small button group">
+                    <button type="button" class="btn btn-default">24 hours</button>
+                    <button type="button" class="btn btn-default">3 days</button>
+                    <button type="button" class="btn btn-default">1 week</button>
+                </div>
                 <div id="chart-container" class="container" style="width: 100%; height: 320px;">
                    {% include "chart.html" %}
                 </div>
             </div>
 
             <!-- 结果 -->
-            <div class="panel " style="height: 440px;">
+            <div class="panel " style="height: 408px;">
                 <div class="text-black">Task Result</div>
-                <div class="container" style="width: 100%">
-                    <div class="col-md-5">
-                        <div class="text-grey" style="margin-top: 3px;margin-left: -20px">Imputation Statistics</div>
+
+                <div class="container" style="width: 100%; display: flex; flex-flow: row nowrap;">
+                    <div style="flex: 1;margin-left: -12px">
+                        <div class="text-grey" style="margin-top: 3px;">Imputation Statistics</div>
                         {% include "impute_results.html" %}
                     </div>
-                    <div class="col-md-7">
-                        <div class="text-grey" style="margin-top: 3px;margin-left: 27px">Anomaly Statistics</div>
+                    <div style="flex: 1;margin-left: 8px">
+                        <div class="text-grey" style="margin-top: 3px;">Anomaly Statistics</div>
                         {% include "Anomaly_results.html" %}
                     </div>
                 </div>
@@ -226,10 +232,11 @@
         </div>
 
         <div class="col-md-3 column-custom">
-            <div class="panel " style="height: 760px;">
-                <div style="width:100%;height: 400px;" id="missing_rate_chart">
+            <div class="panel " style="height: 766px;">
+                <div class="text-black">Statistical Analysis</div>
+                <div style="width:100%;height: 400px;margin-top: 15px" id="missing_rate_chart">
                 </div>
-                <div style="width:100%;height: 400px;" id="anomaly_rate_chart">
+                <div style="width:100%;height: 400px;margin-top: -50px" id="anomaly_rate_chart">
                 </div>
             </div>
         </div>
@@ -263,6 +270,8 @@
         </div>
     </div>
 </div>
+
+
 
 <script src="{% static "plugins/jquery-3.7.1.min.js" %}"></script>
 <script src="{% static "plugins/bootstrap-3.4.1/js/bootstrap.min.js" %}"></script>
