@@ -15,6 +15,7 @@ def offline(request):
 
 def online(request):
     models.PreData.objects.all().delete()
+    models.ImputeResult.objects.all().delete()
 
     queryset1 = models.ImputeResult.objects.all()
     page_object1 = Pagination(request, queryset1)

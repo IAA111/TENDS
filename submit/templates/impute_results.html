@@ -22,7 +22,7 @@
             <tbody>
             {% for obj in queryset1 %}
                 <tr>
-                    <td>{{ obj.id }}</td>
+                    <td>{{ obj.index }}</td>
                     <td>{{ obj.time }}</td>
                     <td>{{ obj.variable }}</td>
                     <td>{{ obj.Imputed_value|floatformat:2 }}</td>

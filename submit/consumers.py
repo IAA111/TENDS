@@ -3,7 +3,7 @@ import json
 import time
 import asyncio
 from asgiref.sync import sync_to_async
-from submit.models import Task,PreData
+from submit.models import Task,PreData,ImputeResult
 from channels.consumer import AsyncConsumer
 from geomloss import SamplesLoss
 from sklearn.preprocessing import StandardScaler
@@ -185,6 +185,7 @@ class TaskChatConsumer(AsyncConsumer):
 
         mask = mask.numpy()
 
+        # 存储补全后数据至PreData
         save_predata = sync_to_async(PreData.save)
 
         for i, row in enumerate(sk_imp):
@@ -200,6 +201,21 @@ class TaskChatConsumer(AsyncConsumer):
             )
             # 使用await调用异步保存方法
             await save_predata(predata)
+
+        # 存储缺失点信息
+        save_impute_result = sync_to_async(ImputeResult.save)
+
+        for i, row in enumerate(sk_imp):
+            for j, value in enumerate(row):
+                if mask[i, j]:
+                    # 仅保存缺失值的补全结果
+                    impute_result = ImputeResult(
+                        index=i,
+                        variable=j + 1,  # 列号从 1 开始
+                        Imputed_value=value
+                    )
+                    # 使用 await 调用异步保存方法
+                    await save_impute_result(impute_result)
             
 
 
