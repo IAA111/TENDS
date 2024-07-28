@@ -15,6 +15,7 @@ def offline(request):
     return render(request, 'home.html')
 
 def online(request):
+    models.AnomalyResult.objects.all().delete()
     models.PreData.objects.all().delete()
     models.ImputeResult.objects.all().delete()
 
