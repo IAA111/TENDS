@@ -27,6 +27,8 @@ $(function (){
     bindBtnSaveDetails();
     // 更新异常饼图
     setInterval(updateAnomalyRateChart, 1000);
+    // 点击按钮变色
+    clickbtncolor();
 
 })
 
@@ -430,5 +432,16 @@ function bindBtnSaveDetails(){
 })
 }
 
+function clickbtncolor(){
+    $(".btn-group-xs .btn").click(function(){
+        // 先重置所有按钮的颜色
+        $(".btn-group-xs .btn").removeClass("btn-selected");
+        $(".btn-group-xs .btn").addClass("btn-default");
+
+        // 为选中的按钮添加新样式
+        $(this).removeClass("btn-default");
+        $(this).addClass("btn-selected");
+    });
+}
 
 
