@@ -212,7 +212,7 @@ function initMissingRateChart(){
   },
   series: [
     {
-      name: 'Access From',
+      name: 'Missing Rate',
       type: 'pie',
       radius: '50%',
       data: [
@@ -247,7 +247,7 @@ function updateMissingRateChart(newCount_nan, newCount_not_nan) {
 function initAnomalyRateChart(){
     option_3 = {
   title: {
-    text: 'anomaly_rate_chart',
+    text: 'Anomaly Rate Chart',
     left: 'center',
     top: '18%'
   },
@@ -255,19 +255,21 @@ function initAnomalyRateChart(){
     trigger: 'item'
   },
   legend: {
-       top: '5%',
+       top: '0.5%',
   },
   series: [
     {
-      name: 'Access From',
+      name: 'Anomaly Rate',
       type: 'pie',
       radius: '50%',
       data: [
-        { value: 1048, name: 'Search Engine' },
-        { value: 735, name: 'Direct' },
-        { value: 580, name: 'Email' },
-        { value: 484, name: 'Union Ads' },
-        { value: 300, name: 'Video Ads' }
+         { value: 0, name: 'Large concurrency' },
+         { value: 0, name: 'Out of memory' },
+         { value: 0, name: 'Lock race' },
+         { value: 0, name: 'Network delay' },
+         { value: 0, name: 'Index failure' },
+         { value: 0, name: 'Complex query' },
+          { value: 0, name: 'Others' }
       ],
       emphasis: {
         itemStyle: {
