@@ -173,3 +173,35 @@ def get_anomaly_data(request):
     result = [{'name': key, 'value': value} for key, value in result_dict.items()]
 
     return JsonResponse(result, safe=False)
+
+@csrf_exempt
+def train_save(request):
+    if request.method == 'POST':
+
+        impute_model = request.POST['impute_model']
+        predict_model = request.POST['predict_model']
+        train_data_size_str = request.POST['train_data_size']
+        train_data_size = float(train_data_size_str.strip('%')) / 100
+        predict_window_size_str = request.POST['predict_window_size']
+        predict_window_size = float(predict_window_size_str.strip('%')) / 100
+        imputation_size_str = request.POST['imputation_size']
+        imputation_size = float(imputation_size_str.strip('%')) / 100
+        # 处理文件上传
+        dataset = request.FILES['dataset'] if 'dataset' in request.FILES else None
+
+        # 存入数据库
+        obj = models.TrainParameters(
+            impute_model=impute_model,
+            predict_model=predict_model,
+            train_data_size=train_data_size,
+            predict_window_size=predict_window_size,
+            imputation_size= imputation_size,
+            dataset=dataset
+        )
+        obj.save()
+        print(obj)
+
+        return JsonResponse({"message": "TrainParameters Successfully Saved"})
+    else:
+        return JsonResponse({"error": "error"}, status=400)
+

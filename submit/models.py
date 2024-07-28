@@ -30,5 +30,13 @@ class AnomalyResult(models.Model):
     predict_value = models.FloatField()
     analysis = models.CharField(max_length=255, default='')
 
+class TrainParameters(models.Model):
+    impute_model = models.TextField()
+    predict_model = models.TextField()
+    train_data_size = models.FloatField()
+    predict_window_size = models.FloatField()
+    imputation_size = models.FloatField()
+    dataset = models.FileField(verbose_name='dataset',max_length=128,upload_to='dataset/')
+
 
 

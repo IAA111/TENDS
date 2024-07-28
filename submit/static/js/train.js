@@ -16,6 +16,8 @@ $(function (){
     StartTrain();
     // 训练结果表单分页
     ShowTrainResults();
+    //显示选中文件名
+    showfilename();
 
 })
 
@@ -238,3 +240,13 @@ function ShowTrainResults() {
     });
 }
 
+function showfilename(){
+    $('#upload').change(function() {
+        var filename = $(this).val().split('\\').pop();
+        $('.custom-file-upload').text(filename);
+    });
+}
+
+function redirectToURL() {
+    window.location.href = "http://localhost:8000/online/";
+}
