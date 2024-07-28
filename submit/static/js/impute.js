@@ -25,6 +25,9 @@ $(function (){
     bindBtnDetails();
     // 保存 details 设置按钮
     bindBtnSaveDetails();
+    // 更新异常饼图
+    setInterval(updateAnomalyRateChart, 1000);
+
 })
 
     function ImputeModelSelect() {
@@ -283,6 +286,28 @@ function initAnomalyRateChart(){
 };
     myChart3.setOption(option_3);
 }
+
+function updateAnomalyRateChart() {
+    $.ajax({
+        url: "/get_anomaly_data/",
+        type: "GET",
+        dataType: "json",
+        success: function (res) {
+            myChart3.setOption({
+                series: [
+                    {
+                        data: res
+                    }
+                ]
+            });
+        },
+        error: function (xhr, status, error) {
+            console.error('AJAX request failed:', status, error);
+        }
+    });
+}
+
+
 
 function fetchImputeData(page = currentImputePage) {
     currentImputePage = page;  // 更新当前页码

@@ -28,6 +28,7 @@ urlpatterns = [
     path('load_anomaly_results/', views.load_anomaly_results),
     path('get/analysis/', views.get_analysis),
     path('save/analysis/', views.save_analysis),
+    path('get_anomaly_data/', views.get_anomaly_data)
 
 
 ]

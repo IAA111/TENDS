@@ -9,6 +9,7 @@ import json
 from submit.utils.pagination import Pagination
 from django.core import serializers
 from submit import models
+from django.db.models import Count
 
 def offline(request):
     return render(request, 'home.html')
@@ -139,3 +140,35 @@ def save_analysis(request):
             return JsonResponse({'status': 'ERROR', 'error': 'Item not found'})
     else:
         return JsonResponse({'status': 'ERROR', 'error': 'Invalid request'})
+
+def get_anomaly_data(request):
+    # 查询分析字段的统计数据
+    data = models.AnomalyResult.objects.exclude(analysis__isnull=True).exclude(analysis__exact='').values('analysis').annotate(
+        count=Count('analysis'))
+    # 指定的分类
+    categories = [
+        'Large concurrency',
+        'Out of memory',
+        'Lock race',
+        'Network delay',
+        'Index failure',
+        'Complex query'
+    ]
+
+    # 初始化结果字典
+    result_dict = {category: 0 for category in categories}
+    result_dict['Others'] = 0
+
+    # 统计数据
+    for item in data:
+        analysis = item['analysis']
+        count = item['count']
+        if analysis in categories:
+            result_dict[analysis] += count
+        else:
+            result_dict['Others'] += count
+
+    # 将结果字典转换为前端饼图需要的格式
+    result = [{'name': key, 'value': value} for key, value in result_dict.items()]
+
+    return JsonResponse(result, safe=False)
