@@ -116,3 +116,26 @@ def load_anomaly_results(request):
         return JsonResponse({'html': html})
     else:
         return render(request, 'predict.html', context)
+
+def get_analysis(request):
+    uid = request.GET.get('uid')
+    try:
+        record = models.AnomalyResult.objects.get(id=uid)
+    except models.AnomalyResult.DoesNotExist:
+        return JsonResponse({'status': 'ERROR', 'error': 'Record not found'})
+    return JsonResponse({'status': 'OK', 'analysis': record.analysis})
+
+@csrf_exempt
+def save_analysis(request):
+    if request.method == 'POST':
+        uid = request.POST.get('uid')
+        analysis = request.POST.get('analysis')
+        try:
+            item = models.AnomalyResult.objects.get(id=uid)
+            item.analysis = analysis
+            item.save()
+            return JsonResponse({'status': 'OK'})
+        except models.AnomalyResult.DoesNotExist:
+            return JsonResponse({'status': 'ERROR', 'error': 'Item not found'})
+    else:
+        return JsonResponse({'status': 'ERROR', 'error': 'Invalid request'})

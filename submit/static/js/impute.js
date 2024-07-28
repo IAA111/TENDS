@@ -4,8 +4,11 @@ var myChart2 = echarts.init(document.getElementById('missing_rate_chart'));
 var myChart3 = echarts.init(document.getElementById('anomaly_rate_chart'));
 
 $(function (){
+    // 获取补全模型列表
     ImputeModelSelect();
+    // 绑定点击 PredictBatchSize 事件
     PredictModelSelect();
+    //获取预测模型列表
     PredictWindowSize();
     // Task
     Task();
@@ -18,6 +21,7 @@ $(function (){
     // 获取表格数据
     ShowTaskResults();
     // 点击 details 按钮
+    console.log("Document ready, binding event handlers.");
     bindBtnDetails();
     // 保存 details 设置按钮
     bindBtnSaveDetails();
@@ -345,7 +349,9 @@ function ShowTaskResults(){
 }
 
 function bindBtnDetails() {
-    $(".btn-edit").click(function () {
+    console.log("Binding button details.");
+    $('#Anomaly-results-table').on('click', '.btn-edit', function() {
+        console.log("Button clicked.");
         //清空对话框中的数据
         $('#formAdd')[0].reset();
         var currentId = $(this).attr('uid');

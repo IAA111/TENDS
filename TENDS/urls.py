@@ -26,6 +26,8 @@ urlpatterns = [
     path("get_chart_data/",views.get_chart_data),
     path('load_impute_results/', views.load_impute_results),
     path('load_anomaly_results/', views.load_anomaly_results),
+    path('get/analysis/', views.get_analysis),
+    path('save/analysis/', views.save_analysis),
 
 
 ]

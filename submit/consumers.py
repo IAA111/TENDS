@@ -3,7 +3,7 @@ import json
 import time
 import asyncio
 from asgiref.sync import sync_to_async
-from submit.models import Task,PreData,ImputeResult
+from submit.models import Task,PreData,ImputeResult,AnomalyResult
 from channels.consumer import AsyncConsumer
 from geomloss import SamplesLoss
 from sklearn.preprocessing import StandardScaler
@@ -279,6 +279,23 @@ class TaskChatConsumer(AsyncConsumer):
                     )
                     # 使用 await 调用异步保存方法
                     await save_impute_result(impute_result)
+
+
+        # 存储异常信息
+        save_anomaly_result = sync_to_async(AnomalyResult.save)
+        for i in range(prediction_len):
+            for j in range(len(predicted_mask[i])):
+                if predicted_mask[i][j]:
+                    anomaly_result = AnomalyResult(
+                        time='',  # 这里应该填写对应的时间戳
+                        index=i + train_len,
+                        variable=j + 1,  # 列号从 1 开始
+                        true_value=sk_imp[i + train_len][j],
+                        predict_value=predict[i][j],
+                        analysis='',  # 可以在这里填写一些分析备注或保持默认
+                    )
+                    await save_anomaly_result(anomaly_result)
+
 
     async def predict(self):
         print("开始执行预测")

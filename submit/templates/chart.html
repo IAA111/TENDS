@@ -4,17 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-     <link rel="stylesheet" href="{% static 'plugins/bootstrap-3.4.1/css/bootstrap.min.css' %}">
 </head>
 <body>
 
 <div id="main" style="width: 100%;height: 100%;">
 
 </div>
-<script src = "{% static "plugins/jquery-3.7.1.min.js" %}"></script>
 <script type="text/javascript">
-
-
 $(function (){
     initChart();
     updateChart();
@@ -159,7 +155,6 @@ function process_data(newData) {
                 animationDurationUpdate: 0,
                 itemStyle: { color: 'yellow' },
             };
-            console.log('Real Line MarkPoint:', markPoint);
             option.series[i * 2].markPoint.data.push(markPoint);
         }
 
