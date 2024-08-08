@@ -16,7 +16,7 @@ $(function (){
     StartTrain();
     // 训练结果表单分页
     ShowTrainResults();
-    //显示选中文件名
+    // 显示选中文件名
     showfilename();
 
 })
@@ -118,7 +118,34 @@ function binBtnTrainSetSave() {
              console.log("Error details: ", errorThrown);
              console.log(JSON.stringify(params));
    }})
-        })}
+
+            //清空对话框中的数据
+            $('#formAdd')[0].reset();
+            $.ajax(
+                {
+                    url:"/order/detail/",
+                    type:'get',
+                    dataType:"JSON",
+                    success: function (res){
+                        if (res.status){
+                            console.log(res.data)
+                            // 将数据赋值到对话框的标签中
+                            $.each(res.data,function(name,value){
+                                $('#id_'+name).val(value);
+                            })
+                            // 点击编辑 显示对话框
+                            $('#myModal').modal('show')
+                        }else {
+                            alert(res.error)
+                        }
+                    }
+
+                }
+            )
+
+
+        })
+}
 
 function StartTrain(){
     let intervalId;

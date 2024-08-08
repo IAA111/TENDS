@@ -30,6 +30,7 @@ urlpatterns = [
     path('save/analysis/', views.save_analysis),
     path('get_anomaly_data/', views.get_anomaly_data),
     path('train/save/', views.train_save),
+    path("order/detail/",views.order_detail),
 
 
 ]

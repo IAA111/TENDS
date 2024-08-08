@@ -10,6 +10,7 @@ from submit.utils.pagination import Pagination
 from django.core import serializers
 from submit import models
 from django.db.models import Count
+from django.forms.models import model_to_dict
 
 def offline(request):
     return render(request, 'home.html')
@@ -204,4 +205,19 @@ def train_save(request):
         return JsonResponse({"message": "TrainParameters Successfully Saved"})
     else:
         return JsonResponse({"error": "error"}, status=400)
+
+def order_detail(request):
+    last_object = models.TrainParameters.objects.last()
+    if not last_object:
+        return JsonResponse({'status': False, 'error': '数据不存在'})
+
+        # 将模型实例转换为字典
+    row_dict = model_to_dict(last_object)
+
+    result = {
+        'status': True,
+        'data': row_dict
+    }
+    json_data = json.dumps(result, default=str)  # 使用 `default=str` 处理不可序列化的对象
+    return JsonResponse(json.loads(json_data))
 
