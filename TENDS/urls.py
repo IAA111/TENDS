@@ -31,6 +31,7 @@ urlpatterns = [
     path('get_anomaly_data/', views.get_anomaly_data),
     path('train/save/', views.train_save),
     path("order/detail/",views.order_detail),
+    path('load_train_results/', views.load_train_results),
 
 
 ]

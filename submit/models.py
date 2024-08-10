@@ -38,5 +38,14 @@ class TrainParameters(models.Model):
     imputation_size = models.FloatField()
     dataset = models.FileField(verbose_name='dataset',max_length=128,upload_to='dataset/')
 
+class TrainingResult(models.Model):
+    model = models.CharField(max_length=20)
+    dataset = models.CharField(max_length=64)
+    train_time = models.FloatField()
+    predict_time = models.FloatField()
+    accuracy = models.FloatField()
+    precision = models.FloatField()
+    SMAPE = models.FloatField()
+
 
 

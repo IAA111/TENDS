@@ -20,9 +20,13 @@ class TrainParametersForm(BootStrapModelForm):
 
 
 def offline(request):
-    form = TrainParametersForm
+    form = TrainParametersForm()
+    queryset = models.TrainingResult.objects.all()
+    page_object = Pagination(request, queryset, page_size=7)
     context = {
         'form': form,
+        'queryset': page_object.page_queryset,
+        'page_string': page_object.html()
     }
     return render(request, 'home.html', context)
 
@@ -231,3 +235,18 @@ def order_detail(request):
     }
     return JsonResponse(result)
 
+def load_train_results(request):
+    page = request.GET.get('page', 1)
+    queryset = models.TrainingResult.objects.all()
+    page_object = Pagination(request, queryset, page_size=7)
+
+    context = {
+        'queryset': page_object.page_queryset,
+        'page_string': page_object.html()
+    }
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        html = render_to_string('train_results.html', context, request=request)
+        return JsonResponse({'html': html})
+
+    else:
+        return render(request, 'home.html', context)

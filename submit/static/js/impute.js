@@ -21,7 +21,6 @@ $(function (){
     // 获取表格数据
     ShowTaskResults();
     // 点击 details 按钮
-    console.log("Document ready, binding event handlers.");
     bindBtnDetails();
     // 保存 details 设置按钮
     bindBtnSaveDetails();
