@@ -11,9 +11,21 @@ from django.core import serializers
 from submit import models
 from django.db.models import Count
 from django.forms.models import model_to_dict
+from submit.utils.bootstrap import BootStrapModelForm
+
+class TrainParametersForm(BootStrapModelForm):
+    class Meta:
+        model = models.TrainParameters
+        exclude = ['dataset']
+
 
 def offline(request):
-    return render(request, 'home.html')
+    form = TrainParametersForm
+    context = {
+        'form': form,
+    }
+    return render(request, 'home.html', context)
+
 
 def online(request):
     models.AnomalyResult.objects.all().delete()
@@ -211,13 +223,11 @@ def order_detail(request):
     if not last_object:
         return JsonResponse({'status': False, 'error': '数据不存在'})
 
-        # 将模型实例转换为字典
-    row_dict = model_to_dict(last_object)
-
+    exclude_fields = ['dataset']  # 排除 dataset 字段
+    row_dict = model_to_dict(last_object, exclude=exclude_fields)
     result = {
         'status': True,
         'data': row_dict
     }
-    json_data = json.dumps(result, default=str)  # 使用 `default=str` 处理不可序列化的对象
-    return JsonResponse(json.loads(json_data))
+    return JsonResponse(result)
 

@@ -18,6 +18,9 @@ $(function (){
     ShowTrainResults();
     // 显示选中文件名
     showfilename();
+    // 模态框保存
+    binBtnSave();
+
 
 })
 
@@ -276,4 +279,12 @@ function showfilename(){
 
 function redirectToURL() {
     window.location.href = "http://localhost:8000/online/";
+}
+
+function binBtnSave(){
+     $('#btnSave').click(function() {
+          console.log('Button clicked!');
+        console.log('Hiding modal...');
+        $('#myModal').modal('hide');
+    });
 }

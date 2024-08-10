@@ -308,20 +308,17 @@
                     <form id="formAdd">
                         <div class="clearfix">
                             {% for field in form %}
-                                <div class="col-xs-6">
                                     <div class="form-group">
                                         <label>{{ field.label }}</label>
                                         {{ field }}
                                     </div>
-                                </div>
                             {% endfor %}
                         </div>
                     </form>
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">cancel</button>
-                    <button id="btnSave" type="button" class="btn btn-primary">save</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">save</button>
                 </div>
             </div>
         </div>
