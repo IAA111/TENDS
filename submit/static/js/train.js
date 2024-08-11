@@ -81,7 +81,6 @@ function ImputeModelSelect(){
 });
 }
 
-
 function binBtnTrainSetSave() {
     $('#BtnTrainSetSave').click(function () {
         var form_data = new FormData();
@@ -113,17 +112,11 @@ function binBtnTrainSetSave() {
             contentType: false,
             success: function (data) {
                 console.log("Success: ", data);
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-             console.log(params);
-             console.log("jqXHR: ", jqXHR);
-             console.log("textStatus: ", textStatus);
-             console.log("Error details: ", errorThrown);
-             console.log(JSON.stringify(params));
-   }})
 
-            //清空对话框中的数据
+
+                //清空对话框中的数据
             $('#formAdd')[0].reset();
+
             $.ajax(
                 {
                     url:"/order/detail/",
@@ -136,7 +129,7 @@ function binBtnTrainSetSave() {
                             $.each(res.data,function(name,value){
                                 $('#id_'+name).val(value);
                             })
-                            // 点击编辑 显示对话框
+
                             $('#myModal').modal('show')
                         }else {
                             alert(res.error)
@@ -145,10 +138,18 @@ function binBtnTrainSetSave() {
 
                 }
             )
-
-
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+             console.log(params);
+             console.log("jqXHR: ", jqXHR);
+             console.log("textStatus: ", textStatus);
+             console.log("Error details: ", errorThrown);
+             console.log(JSON.stringify(params));
+   }})
         })
 }
+
+
 
 function StartTrain(){
     let intervalId;

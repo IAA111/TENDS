@@ -216,7 +216,7 @@ def train_save(request):
             dataset=dataset
         )
         obj.save()
-        print(obj)
+
 
         return JsonResponse({"message": "TrainParameters Successfully Saved"})
     else:
