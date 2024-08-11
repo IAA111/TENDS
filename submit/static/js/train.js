@@ -22,8 +22,6 @@ $(function (){
     binBtnSave();
     // 处理分页点击事件
 
-
-
 })
 
 function TrainDataSize(){
@@ -174,45 +172,36 @@ function StartTrain(){
         console.log(`return message:${event.data}`);
         let data = JSON.parse(event.data)
 
-        start_time = new Date(data.start_time * 1000);
-        data.start_time = start_time.toLocaleString();
+        let start_time = new Date(data.start_time * 1000);
 
-        let impute_start_time = new Date(data.impute_start_time * 1000);
-        let predict_start_time = new Date(data.predict_start_time * 1000);
-
-
-        document.getElementById("imputeStatus").textContent = data.impute_status;
-        document.getElementById("predictStatus").textContent = data.predict_status;
-        document.getElementById("PreModelCount").textContent = data.predict_model_count + "/" + data.predict_total_model;
-        document.getElementById("ImpModelCount").textContent = data.impute_model_count + "/" + data.impute_total_model;
-
-         if (intervalId) {
+        if (intervalId) {
             clearInterval(intervalId);
         }
         intervalId = setInterval(() => {
-            updateTaskTime(impute_start_time, predict_start_time);
+            updateTaskTime(start_time);
         }, 1000);
 
-        if (data.predict_status === "finished") {
-            clearInterval(intervalId);
-        }
-    }
-          function updateTaskTime(imputeStartTime, predictStartTime) {
-    let currentTime = new Date();
 
-    if (document.getElementById("imputeStatus").textContent !== "finished") {
+
+        start_time = new Date(data.start_time * 1000);
+        data.start_time = start_time.toLocaleString();
+
+
+
+        document.getElementById("PreModelCount").textContent = data.predict_model_count + "/" + data.predict_total_model;
+        document.getElementById("ImpModelCount").textContent = data.impute_model_count + "/" + data.impute_total_model;
+
+
+
+    }
+
+    function updateTaskTime(StartTime) {
+        let currentTime = new Date();
+
         let imputeTime = parseInt((currentTime - imputeStartTime) / 1000);
         let formattedImputeTime = formatTime(imputeTime);
         document.getElementById("imputeTaskTime").textContent = formattedImputeTime;
     }
-
-    if (document.getElementById("predictStatus").textContent !== "Not Started" &&
-        document.getElementById("predictStatus").textContent !== "finished") {
-        let predictTime = parseInt((currentTime - predictStartTime) / 1000);
-        let formattedPredictTime = formatTime(predictTime);
-        document.getElementById("predictTaskTime").textContent = formattedPredictTime;
-    }
-}
 
 // 将获得的秒数转换为 HH:MM:SS 格式
     function formatTime(seconds) {
