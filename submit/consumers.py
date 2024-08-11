@@ -220,13 +220,14 @@ class TaskChatConsumer(AsyncConsumer):
         print(predict)
         print(train_len, prediction_len, len(sk_imp))  # 1052 451 1503
 
+        # 异常检测
         predicted_mask = []
         for i in range(0, prediction_len):
             row_mask = []
             for j in range(len(sk_imp[i])):
                 if sk_imp[i + train_len][j] != 0:
                     diff_percentage = abs((sk_imp[i + train_len][j] - predict[i][j]) / sk_imp[i + train_len][j])
-                    if diff_percentage > 1.2:
+                    if diff_percentage > 1.2:  # 异常系数
                         row_mask.append(True)
                     else:
                         row_mask.append(False)
@@ -236,13 +237,15 @@ class TaskChatConsumer(AsyncConsumer):
         predicted_mask = np.array(predicted_mask)
 
 
-        # 存储补全后数据至PreData  前70%
+
         save_predata = sync_to_async(PreData.save)
 
+        # 存储补全后数据至PreData  前70%未预测部分  用于chart数据提取
         for i in range(train_len):
             data_str = ','.join(map(lambda x: '{:.2f}'.format(x), sk_imp[i]))
             mask_str = ','.join(map(str, mask[i]))
             predata = PreData(
+                # time 数据库中类型是 DateTimeField
                 index=i,
                 data=data_str,
                 mask=mask_str,
@@ -251,12 +254,14 @@ class TaskChatConsumer(AsyncConsumer):
             )
             await save_predata(predata)
 
+        # 存储预测后数据至PreData  后30%预测部分
         for i in range(prediction_len):
             data_str = ','.join(map(lambda x: '{:.2f}'.format(x), sk_imp[i + train_len]))
             mask_str = ','.join(map(str, mask[i + train_len]))
             predicted_data_str = ','.join(map(lambda x: '{:.2f}'.format(x), predict[i]))
             predicted_mask_str = ','.join(map(lambda x: str(x), predicted_mask[i]))
             predata = PreData(
+                # time 数据库中类型是 DateTimeField
                 index=i + train_len,
                 data=data_str,
                 mask=mask_str,
@@ -273,6 +278,7 @@ class TaskChatConsumer(AsyncConsumer):
                 if mask[i, j]:
                     # 仅保存缺失值的补全结果
                     impute_result = ImputeResult(
+                        # time 数据库中类型是 CharField
                         index=i,
                         variable=j + 1,  # 列号从 1 开始
                         Imputed_value=value
