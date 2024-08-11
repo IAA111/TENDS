@@ -171,7 +171,9 @@ function StartTrain(){
 
     socket.onmessage = function(event){
         console.log(`return message:${event.data}`);
+
         let data = JSON.parse(event.data)
+        console.log(`Start time received from server: ${data.start_time}`);
 
         let start_time = new Date(data.start_time * 1000);
 
@@ -182,25 +184,15 @@ function StartTrain(){
             updateTaskTime(start_time);
         }, 1000);
 
-
-
-        start_time = new Date(data.start_time * 1000);
-        data.start_time = start_time.toLocaleString();
-
-
-
         document.getElementById("PreModelCount").textContent = data.predict_model_count + "/" + data.predict_total_model;
         document.getElementById("ImpModelCount").textContent = data.impute_model_count + "/" + data.impute_total_model;
-
-
 
     }
 
     function updateTaskTime(StartTime) {
         let currentTime = new Date();
-
-        let imputeTime = parseInt((currentTime - imputeStartTime) / 1000);
-        let formattedImputeTime = formatTime(imputeTime);
+        let Time = parseInt((currentTime - StartTime) / 1000);
+        let formattedImputeTime = formatTime(Time);
         document.getElementById("imputeTaskTime").textContent = formattedImputeTime;
     }
 
