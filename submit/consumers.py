@@ -205,13 +205,8 @@ class TaskChatConsumer(AsyncConsumer):
             # 获取当前列的数据
             history_data = data[column]
 
-            # 创建ETS模型
-            model_search = auto_arima(history_data.squeeze(), information_criterion='aic', seasonal_test='ocsb')
-
-            # 训练模型
-            predictor = ARIMA(history_data.squeeze(), order=model_search.order).fit()
-
-            # 预测
+            predictor = ETSModel(history_data.squeeze(), error="add", trend="additive", seasonal="add",
+                                 seasonal_periods=4).fit()
             pred_res = predictor.forecast(prediction_len)
 
             # 将预测结果添加到predictions DataFrame结构中
