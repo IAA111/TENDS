@@ -246,7 +246,7 @@ class TaskChatConsumer(AsyncConsumer):
             data_str = ','.join(map(lambda x: '{:.2f}'.format(x), sk_imp[i]))
             mask_str = ','.join(map(str, mask[i]))
             predata = PreData(
-                # time 数据库中类型是 DateTimeField
+                time=formatted_time_index[i],
                 index=i,
                 data=data_str,
                 mask=mask_str,
@@ -262,7 +262,7 @@ class TaskChatConsumer(AsyncConsumer):
             predicted_data_str = ','.join(map(lambda x: '{:.2f}'.format(x), predict[i]))
             predicted_mask_str = ','.join(map(lambda x: str(x), predicted_mask[i]))
             predata = PreData(
-                # time 数据库中类型是 DateTimeField
+                time=formatted_time_index[i + train_len],
                 index=i + train_len,
                 data=data_str,
                 mask=mask_str,

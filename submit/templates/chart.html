@@ -39,7 +39,7 @@ function initChart(){
             }
         },
         xAxis: {
-            type: 'value',
+            type: 'time',
             splitLine: {
                 show: false
             },
@@ -84,7 +84,7 @@ function process_data(newData) {
         var figureNumber = Math.floor(option.series.length / 2);
         var isPredicted = option.series.length % 2 == 1;
         var color = colors[figureNumber % colors.length];
-        var seriesName = 'Variable ' + (figureNumber + 1) + (isPredicted ? ' Predicted' : '');
+        var seriesName = 'V ' + (figureNumber + 1) + (isPredicted ? ' Predicted' : '');
         option.series.push({
             data: [],
             type: 'line',
@@ -113,8 +113,8 @@ function process_data(newData) {
 
         // 加入新的补全数据点
         var dataPoint = {
-            name: newData.index,
-            value: [newData.index, value],   // 可以 newData.index 改为时间
+            name: newData.time,
+            value: [newData.time, value],   // 可以 newData.index 改为时间
         };
         option.series[i * 2].data.push(dataPoint);
 
@@ -130,8 +130,8 @@ function process_data(newData) {
             }
 
             var predictedDataPoint = {
-                name: newData.index,
-                value: [newData.index, newData.predicted_figures[i]],
+                name: newData.time,
+                value: [newData.time, newData.predicted_figures[i]],
             };
 
             option.series[i * 2 + 1].data.push(predictedDataPoint);
@@ -148,7 +148,7 @@ function process_data(newData) {
 
         if (newData.highlighted_figures[i] !== null) {
             var markPoint = {
-                coord: [newData.index, value],   // newData.time
+                coord: [newData.time, value],   // newData.time
                 symbol: 'circle',
                 symbolSize: 20,
                 label: { show: false },
@@ -161,7 +161,7 @@ function process_data(newData) {
 
         if (newData.highlighted_predicted_figures[i] !== null && newData.predicted_figures[i] !== null) {
             var markPoint = {
-                coord: [newData.index, newData.predicted_figures[i]],     // newData.time
+                coord: [newData.time, newData.predicted_figures[i]],     // newData.time
                 symbol: 'circle',
                 symbolSize: 20,
                 label: { show: false },

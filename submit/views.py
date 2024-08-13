@@ -77,6 +77,7 @@ def get_chart_data(request):
     formatted_data = []
     for row in data:
         index = row['index']
+        time = row['time']
         figures = [float(i) for i in row['data'].split(',')]
 
         # 去除mask中的空格并转换为布尔值
@@ -98,6 +99,7 @@ def get_chart_data(request):
 
         formatted_data.append({
             "index": index,
+            "time": time,
             "figures": figures,
             "predicted_figures": predicted_figures,
             "highlighted_figures": highlighted_figures,

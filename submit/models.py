@@ -14,7 +14,7 @@ class PreData(models.Model):
     mask = models.TextField()
     predicted_data = models.TextField(default='')
     predicted_mask = models.TextField(default='')
-    time = models.DateTimeField(null=True, blank=True)
+    time = models.CharField(max_length=24, null=True, blank=True)
 
 class ImputeResult(models.Model):
     time = models.CharField(max_length=24,null=True, blank=True)
