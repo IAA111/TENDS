@@ -145,7 +145,7 @@ class TaskChatConsumer(AsyncConsumer):
 
             return X_filled
 
-        f = "/Users/sherryd/Desktop/onehr.csv"
+        f = "media/dataset/onehr.csv"
         df = pd.read_csv(f, parse_dates=[0], header=None, index_col=0, date_format='%m/%d/%Y', nrows=500, usecols=range(7))
         # df.values 将 DataFrame 转换为 NumPy 数组
         X = df.values[::].astype('float')  # 得到缺失数组
@@ -268,7 +268,7 @@ class TaskChatConsumer(AsyncConsumer):
 
         # 存储缺失点信息 impute_result
         save_impute_result = sync_to_async(ImputeResult.save)
-
+        count = 1
         for i, row in enumerate(sk_imp):
             for j, value in enumerate(row):
                 if mask[i, j]:
@@ -277,32 +277,37 @@ class TaskChatConsumer(AsyncConsumer):
                         time = formatted_time_index[i],
                         index=i,
                         variable=j + 1,  # 列号从 1 开始
-                        Imputed_value=value
+                        Imputed_value=value,
+                        count = count
                     )
                     # 使用 await 调用异步保存方法
                     await save_impute_result(impute_result)
+                    count += 1
 
 
         # 存储异常信息
         save_anomaly_result = sync_to_async(AnomalyResult.save)
+        count = 1
         for i in range(prediction_len):
             for j in range(len(predicted_mask[i])):
                 if predicted_mask[i][j]:
                     anomaly_result = AnomalyResult(
                         time=formatted_time_index[i + train_len],
                         index=i + train_len,
+                        count=count,
                         variable=j + 1,  # 列号从 1 开始
                         true_value=sk_imp[i + train_len][j],
                         predict_value=predict[i][j],
                         analysis='',  # 可以在这里填写一些分析备注或保持默认
                     )
                     await save_anomaly_result(anomaly_result)
+                    count += 1
 
 
     async def predict(self):
         print("开始执行预测")
 
-        await asyncio.sleep(5)
+        await asyncio.sleep(15)
 
 
 class TrainChatConsumer(AsyncConsumer):

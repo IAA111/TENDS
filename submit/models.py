@@ -18,6 +18,7 @@ class PreData(models.Model):
 
 class ImputeResult(models.Model):
     time = models.CharField(max_length=24,null=True, blank=True)
+    count = models.IntegerField(default=0)
     index = models.IntegerField()
     variable = models.IntegerField()
     Imputed_value = models.FloatField()
@@ -25,6 +26,7 @@ class ImputeResult(models.Model):
 class AnomalyResult(models.Model):
     time = models.CharField(max_length=24,null=True, blank=True)
     index = models.IntegerField()
+    count = models.IntegerField(default=0)
     variable = models.IntegerField()
     true_value = models.FloatField()
     predict_value = models.FloatField()

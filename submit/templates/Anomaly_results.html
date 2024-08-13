@@ -28,7 +28,7 @@
             <tbody>
             {% for obj in queryset2 %}
                 <tr>
-                    <td>{{ obj.index }}</td>
+                    <td>{{ obj.count }}</td>
                     <td>{{ obj.time }}</td>
                     <td>{% with "V" as prefix %}{{ prefix }}{{ obj.variable }}{% endwith %}</td>
                     <td>{{ obj.true_value|floatformat:2 }}</td>
