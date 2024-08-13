@@ -93,7 +93,7 @@ class TaskChatConsumer(AsyncConsumer):
 
         def OTimputer(X, eps, X_true):
             batchsize = 128
-            niter = 300
+            niter = 30
             OT_lr = 1e-2
             noise = 0.1
             n_pairs = 1
@@ -145,13 +145,14 @@ class TaskChatConsumer(AsyncConsumer):
 
             return X_filled
 
-        f = "/Users/sherryd/Desktop/asf1_0.1miss.csv"
-
-        start_time = time.time()
-
-        df = pd.read_csv(f, header=0)
+        f = "/Users/sherryd/Desktop/onehr.csv"
+        df = pd.read_csv(f, parse_dates=[0], header=None, index_col=0, date_format='%m/%d/%Y', nrows=500, usecols=range(7))
         # df.values 将 DataFrame 转换为 NumPy 数组
         X = df.values[::].astype('float')  # 得到缺失数组
+
+        time_index = df.index.values
+        # 时间数组 formatted_time_index
+        formatted_time_index = df.index.strftime('%Y-%m-%d').values
 
         # 得到 mask nan 对应 True
         mask = np.isnan(X)
@@ -278,7 +279,7 @@ class TaskChatConsumer(AsyncConsumer):
                 if mask[i, j]:
                     # 仅保存缺失值的补全结果
                     impute_result = ImputeResult(
-                        # time 数据库中类型是 CharField
+                        time = formatted_time_index[i],
                         index=i,
                         variable=j + 1,  # 列号从 1 开始
                         Imputed_value=value
@@ -293,7 +294,7 @@ class TaskChatConsumer(AsyncConsumer):
             for j in range(len(predicted_mask[i])):
                 if predicted_mask[i][j]:
                     anomaly_result = AnomalyResult(
-                        time='',  # 这里应该填写对应的时间戳
+                        time=formatted_time_index[i + train_len],
                         index=i + train_len,
                         variable=j + 1,  # 列号从 1 开始
                         true_value=sk_imp[i + train_len][j],

@@ -72,7 +72,7 @@ def task_save(request):
 
 def get_chart_data(request):
     # 开始预测点
-    PREDICTION_START_POINT = 1052
+    PREDICTION_START_POINT = 350
     data = models.PreData.objects.all().order_by('index').values()
     formatted_data = []
     for row in data:
