@@ -146,7 +146,15 @@ class TaskChatConsumer(AsyncConsumer):
             return X_filled
 
         f = "media/dataset/onehr.csv"
-        df = pd.read_csv(f, parse_dates=[0], header=None, index_col=0, date_format='%m/%d/%Y', nrows=500, usecols=range(5))
+        df = pd.read_csv(
+            f,
+            parse_dates=[0],  # 解析第一列为日期。
+            header=None,  # 没有表头行。
+            index_col=0,  # 使用第一列作为索引。
+            date_parser=lambda x: pd.to_datetime(x, format='%m/%d/%Y'),  # 指定日期格式。
+            nrows=500,  # 只读取前500行。
+            usecols=range(5)  # 只使用前7列。
+        )
         # df.values 将 DataFrame 转换为 NumPy 数组
         X = df.values[::].astype('float')  # 得到缺失数组
 
@@ -390,5 +398,3 @@ class TrainChatConsumer(AsyncConsumer):
                 "predict_model_count": self.predict_model_count,
             })
         })
-
-
