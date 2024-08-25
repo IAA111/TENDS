@@ -35,7 +35,7 @@ $(function (){
         console.log("Initializing ImputeModelSelect");
 
         var data = {
-            models: ["Model 1", "Model 2", "Model 3", "Model 4"]
+            models: ["OT", "KNN","Global best"]
         };
 
         var selectList = $('#ImputeModelSelect');
@@ -59,7 +59,7 @@ $(function (){
         console.log("Initializing PredictModelSelect");
 
         var data = {
-            models: ["Model 1", "Model 2", "Model 3", "Model 4"]
+            models: ["Transformer","NPTS","ARIMA","Holt-Winters","Linear","Global best"]
         };
 
         var selectList = $('#PredictModelSelect');

@@ -93,7 +93,7 @@ function process_data(newData) {
             },
             showSymbol: false,
             name: isPredicted ? '' : seriesName,
-            lineStyle: isPredicted ? { type: 'dashed' ,width:5} : {},
+            lineStyle: isPredicted ? { type: 'dashed' ,width:3} : {},
             itemStyle: { color: color }
         });
     }
@@ -150,7 +150,7 @@ function process_data(newData) {
             var markPoint = {
                 coord: [newData.time, value],   // newData.time
                 symbol: 'circle',
-                symbolSize: 20,
+                symbolSize: 15,
                 label: { show: false },
                 animation: false,
                 animationDurationUpdate: 0,
@@ -163,7 +163,7 @@ function process_data(newData) {
             var markPoint = {
                 coord: [newData.time, newData.predicted_figures[i]],     // newData.time
                 symbol: 'circle',
-                symbolSize: 20,
+                symbolSize: 15,
                 label: { show: false },
                 animation: false ,
                 animationDurationUpdate: 0,

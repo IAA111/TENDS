@@ -44,7 +44,7 @@ function ImputationSize(){
 
 function PredictModelSelect(){
     var data = {
-        models: ["Model 1", "Model 2", "Model 3", "Model 4"]
+        models: ["LSTM", "Transformer", "DeepAR", "DeepFactor","DeepState","GPForecaster","NBeats","Prophet","NPTS","ARIMA","Holt-Winters","Linear","Global best"]
     };
 
     var selectList = $('#TrainPredictModel');
@@ -64,7 +64,7 @@ function ImputeModelSelect(){
 
     $(document).ready(function() {
     var data = {
-        models: ["Model 1", "Model 2", "Model 3", "Model 4"]
+        models: ["OT", "KNN", "RNN", "LSTM","Global best"]
     };
 
     var selectList = $('#TrainImputeModel');
@@ -174,6 +174,7 @@ function StartTrain(){
 
         let data = JSON.parse(event.data)
         console.log(`Start time received from server: ${data.start_time}`);
+        document.getElementById("predictTaskTime").textContent = "00:00:00";
 
         let start_time = new Date(data.start_time * 1000);
 

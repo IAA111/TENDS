@@ -146,7 +146,7 @@ class TaskChatConsumer(AsyncConsumer):
             return X_filled
 
         f = "media/dataset/onehr.csv"
-        df = pd.read_csv(f, parse_dates=[0], header=None, index_col=0, date_format='%m/%d/%Y', nrows=500, usecols=range(7))
+        df = pd.read_csv(f, parse_dates=[0], header=None, index_col=0, date_format='%m/%d/%Y', nrows=500, usecols=range(5))
         # df.values 将 DataFrame 转换为 NumPy 数组
         X = df.values[::].astype('float')  # 得到缺失数组
 
